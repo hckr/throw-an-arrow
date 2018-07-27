@@ -7,7 +7,7 @@ do
     if [ $find_exit == 1 ] || [ -n "$find_res" ]; then
         printf "[$(date '+%H:%M:%S')] "
         ./compile.py
+        touch watch_checkpoint
     fi
-    touch watch_checkpoint
     sleep 2
 done

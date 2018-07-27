@@ -3,4 +3,4 @@ document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:abso
 // include_once{background_music.js}
 // include_once{game_main.js}
 
-c.onclick = _ => c.webkitRequestFullscreen();
+c.addEventListener('click', e => c.webkitRequestFullscreen());

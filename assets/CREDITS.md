@@ -2,8 +2,13 @@
 
 ## sounds/background.ogg
 
-A cropped version with decreased quality (due to file size constraint) of ["22 - A New Comrade" by t4ngr4m][1] licensed [CC-BY 3.0][2].
+A cropped version with decreased quality (due to file size constraint) of ["22 - A New Comrade" by t4ngr4m][1], [CC-BY 3.0][2].
 
+## images/bow.png, images/arrow.png
+
+Adapted from the work of [johnnytal][3], [CC0 1.0][4].
 
 [1]: https://opengameart.org/content/generic-8-bit-jrpg-soundtrack
 [2]: http://creativecommons.org/licenses/by/3.0/
+[3]: https://opengameart.org/content/bow-and-arrow-spritesheet
+[4]: https://creativecommons.org/publicdomain/zero/1.0/

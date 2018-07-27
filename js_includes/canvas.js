@@ -14,3 +14,7 @@ function compute_canvas_height() {
     canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height'));
 }
 addEventListener('resize', compute_canvas_height);
+
+c.addEventListener('contextmenu', e => {
+    e.preventDefault();
+});

@@ -40,7 +40,7 @@ Bow.prototype.strain = function() {
                     this.state = BowState.STRAINED;
                     resolve();
                 }
-            }, 50);
+            }, 30);
         })();
     });
 }

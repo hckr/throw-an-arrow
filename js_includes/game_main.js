@@ -20,7 +20,9 @@ arrow_image.src = '#datauri{image/png,assets/images/arrow.png}';
 let arrow_width = 22,
     arrow_height = 5;
 
-let bow_pos_y = 30;
+let bow_pos_y = 30,
+    bow_pos_y_min = 0,
+    bow_pos_y_max = canvas_height - bow_frame_height;
 
 let arrows = [];
 
@@ -85,14 +87,10 @@ c.addEventListener('contextmenu', e => {
     e.preventDefault();
 });
 
-let mouse_down = false,
-    mouse_down_pos_y,
-    old_bow_pos_y;
+let mouse_down = false;
 
 c.addEventListener('mousedown', e => {
     mouse_down = true;
-    mouse_down_pos_y = e.offsetY;
-    old_bow_pos_y = bow_pos_y;
 
     if (e.which == 3 && can_be_loaded) {
         load_arrow();
@@ -108,8 +106,13 @@ c.addEventListener('mouseup', e => {
 });
 
 c.addEventListener('mousemove', e => {
+    console.log(bow_pos_y_max);
     if (mouse_down) {
-        console.log(canvas_height / canvas_real_height);
-        bow_pos_y = old_bow_pos_y + (e.offsetY - mouse_down_pos_y) * canvas_height / canvas_real_height;
+        bow_pos_y += e.movementY * canvas_height / canvas_real_height;
+        if (bow_pos_y < bow_pos_y_min) {
+            bow_pos_y = bow_pos_y_min;
+        } else if (bow_pos_y > bow_pos_y_max) {
+            bow_pos_y = bow_pos_y_max;
+        }
     }
 });

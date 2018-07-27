@@ -37,8 +37,6 @@ function compute_canvas_height() {
 }
 addEventListener('resize', compute_canvas_height);
 
-ctx.fillStyle = '#008040';
-
 let bow_image = new Image();
 bow_image.src = 'data:image/png;base64,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';
 let bow_frame_width = 35,
@@ -49,27 +47,40 @@ arrow_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAFBAMAAAC
 let arrow_width = 22,
     arrow_height = 5;
 
+let balloon_image = new Image();
+balloon_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAoAgMAAACDXzJIAAAACVBMVEUAAGcAAAD/AABz6q9GAAAAAXRSTlMAQObYZgAAAFJJREFUCNdjYFjAAARMK0Ak1yoEqbWqAY1ctWoBMsnUACK5ICQDErsBIYtMAsWB5qCQYLvgJNANTECjA8CkAAMjVjKAgRVIOjCwwEmICDEqQSQADn4qw55gBtoAAAAASUVORK5CYII=';
+let balloon_frame_width = 10,
+    balloon_frame_height = 40;
+
 let bow_pos_y = 30,
     bow_pos_y_min = 0,
     bow_pos_y_max = canvas_height - bow_frame_height;
 
 let arrows = [];
+let balloons = [];
 
 let is_loaded = false,
     can_be_loaded = true;
 
 let frame = 0;
 
-(function draw(){
+(function draw() {
+    ctx.fillStyle = '#33f';
     ctx.fillRect(0, 0, canvas_width, canvas_height);
     ctx.drawImage(bow_image, (frame % 6) * bow_frame_width, ((frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
                   0, bow_pos_y, bow_frame_width, bow_frame_height);
     if (is_loaded) {
-        ctx.drawImage(arrow_image, 0, 0, arrow_width, arrow_height, 0, bow_pos_y + 20, arrow_width, arrow_height);
+        ctx.drawImage(arrow_image, 0, bow_pos_y + 20);
     }
     for (let arrow of arrows) {
-        console.log(arrow);
-        ctx.drawImage(arrow_image, 0, 0, arrow_width, arrow_height, arrow.x, arrow.y, arrow_width, arrow_height);
+        ctx.drawImage(arrow_image, arrow.x, arrow.y);
+    }
+    for (let balloon of balloons) {
+        if (balloon.pierced) {
+            ctx.drawImage(balloon_image, balloon_frame_width, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+        } else {
+            ctx.drawImage(balloon_image, 0, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+        }
     }
     requestAnimationFrame(draw);
 })();
@@ -100,16 +111,38 @@ function throw_arrow() {
                 can_be_loaded = true;
                 frame = 0;
             }
-        }, 20);
+        }, 10);
     })();
 }
 
 (function update() {
+    balloons.filter(balloon => {
+        for (let arrow of arrows) {
+            let y_dist = arrow.y - balloon.y,
+                x_dist = arrow.x - balloon.x;
+            if (!balloon.pierced &&
+                y_dist > -3 && y_dist < balloon_frame_height - 15 &&
+                x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
+            {
+                balloon.pierced = true;
+                break;
+            }
+        }
+        if (balloon.pierced) {
+            balloon.y += 4;
+        } else {
+            balloon.y -= 2;
+            if (balloon.y < -balloon_frame_height) {
+                balloon.y += canvas_height + balloon_frame_height;
+            }
+        }
+        return !(balloon.pierced && balloon.y > (canvas_height + balloon_frame_height));
+    });
     arrows = arrows.filter(arrow => {
-        arrow.x += 5;
+        arrow.x += 3;
         return arrow.x < canvas_width;
     });
-    setTimeout(update, 50);
+    setTimeout(update, 30);
 })();
 
 c.addEventListener('contextmenu', e => {
@@ -135,9 +168,9 @@ c.addEventListener('mouseup', e => {
 });
 
 c.addEventListener('mousemove', e => {
-    console.log(bow_pos_y_max);
     if (mouse_down) {
         bow_pos_y += e.movementY * canvas_height / canvas_real_height;
+        bow_pos_y |= 0;
         if (bow_pos_y < bow_pos_y_min) {
             bow_pos_y = bow_pos_y_min;
         } else if (bow_pos_y > bow_pos_y_max) {
@@ -145,6 +178,17 @@ c.addEventListener('mousemove', e => {
         }
     }
 });
+
+function create_balloon(x) {
+    balloons.push({
+        x: x,
+        y: canvas_height
+    });
+}
+
+for (let x = 0; x < 200; x += 12) {
+    create_balloon(canvas_width - 20 - x)
+}
 
 
 c.addEventListener('mousedown', e => {

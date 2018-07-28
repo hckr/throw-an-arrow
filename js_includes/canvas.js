@@ -3,6 +3,7 @@ document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:abso
 c.addEventListener('mousedown', e => {
     c.webkitRequestFullscreen();
     c.requestPointerLock();
+    unmuteBackgroundMusic();
 });
 
 let ctx = c.getContext('2d'),

@@ -1,6 +1,6 @@
 function Level1(onlevelend) {
     this.background_color = '#33f';
-    this.arrows_limit = 15;
+    this.arrows_limit = 18;
     this.balloons = [];
     for (let x = 0; x < 200; x += 12) {
         this.balloons.push({

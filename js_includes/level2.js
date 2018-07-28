@@ -1,17 +1,20 @@
-function Level1(onlevelend) {
+function Level2(onlevelend) {
     this.background_color = '#33f';
-    this.arrows_limit = 15;
+    this.arrows_limit = 20;
     this.balloons = [];
-    for (let x = 0; x < 200; x += 12) {
+    let modifier = 100;
+    for (let x = 0; x < 200; x += 15) {
         this.balloons.push({
             x: canvas_width - 20 - x,
-            y: canvas_height
+            y: canvas_height + Math.abs(x - modifier),
+            speed: Math.random() > 0.5 ? 2 : 3
         });
+        modifier += 15;
     }
     this.onlevelend = onlevelend;
 }
 
-Level1.prototype.drawOn = function(ctx) {
+Level2.prototype.drawOn = function(ctx) {
     for (let balloon of this.balloons) {
         if (balloon.pierced) {
             ctx.drawImage(balloon_image, balloon_frame_width, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
@@ -21,7 +24,7 @@ Level1.prototype.drawOn = function(ctx) {
     }
 }
 
-Level1.prototype.update = function(arrows) {
+Level2.prototype.update = function(arrows) {
     this.balloons = this.balloons.filter(balloon => {
         for (let arrow of arrows) {
             let y_dist = arrow.y - balloon.y,
@@ -37,7 +40,7 @@ Level1.prototype.update = function(arrows) {
         if (balloon.pierced) {
             balloon.y += 4;
         } else {
-            balloon.y -= 2;
+            balloon.y -= balloon.speed;
             if (balloon.y < -balloon_frame_height) {
                 balloon.y += canvas_height + balloon_frame_height;
             }

@@ -6,9 +6,7 @@ let bow_frame_width = 35,
 let arrow_image = new Image();
 arrow_image.src = '#datauri{image/png,assets/images/arrow.png}';
 let arrow_width = 22,
-    arrow_height = 5,
-    arrowhead_width = 9
-    arrowhead_x = arrow_width - arrowhead_width;
+    arrow_height = 5;
 
 let balloon_image = new Image();
 balloon_image.src = '#datauri{image/png,assets/images/balloon.png}';

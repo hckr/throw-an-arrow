@@ -1,11 +1,10 @@
 let mouse_down = false;
 
 c.addEventListener('mousedown', e => {
-    mouse_down = true;
-
     switch (e.which) {
     case 1:
         bow.strain();
+        mouse_down = true;
         break;
     case 3:
         if (arrows_remaining--) {
@@ -16,10 +15,9 @@ c.addEventListener('mousedown', e => {
 });
 
 c.addEventListener('mouseup', e => {
-    mouse_down = false;
-
     if (e.which == 1) {
         bow.release_arrow(add_arrow);
+        mouse_down = false;
     }
 });
 

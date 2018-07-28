@@ -1,5 +1,13 @@
 // include_once{level1.js}
+// include_once{level2.js}
 
-function construct_first_level(onlevelend) {
-    return new Level1(onlevelend);
+let levels_count = 2;
+
+function construct_level(n, onlevelend) {
+    switch (n) {
+    case 1:
+        return new Level1(onlevelend);
+    case 2:
+        return new Level2(onlevelend);
+    }
 }

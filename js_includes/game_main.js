@@ -6,6 +6,7 @@
 let bow = new Bow(30),
     arrows_remaining = 0,
     arrows = [],
+    level_n,
     level,
     last_arrow_timeout = null;
 
@@ -19,7 +20,15 @@ function add_arrow(arrow) {
 function onlevelend(success) {
     clearTimeout(last_arrow_timeout);
     last_arrow_timeout = null;
-    level = construct_first_level(onlevelend);
+    if (success) {
+        ++level_n;
+        if (level_n > levels_count) {
+            level_n = 1;
+        }
+    } else {
+        level_n = 1;
+    }
+    level = construct_level(level_n, onlevelend);
     arrows_remaining = level.arrows_limit;
 }
 
@@ -47,6 +56,6 @@ function update() {
     setTimeout(update, 20);
 }
 
-onlevelend();
+onlevelend(false);
 update();
 draw();

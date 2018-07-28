@@ -8,7 +8,16 @@ A cropped version with decreased quality (due to file size constraint) of ["22 -
 
 Adapted from the work of [johnnytal][3], [CC0 1.0][4].
 
+## images/violet.png
+
+By Agnieszka Młokosiewicz, [CC-BY-SA 3.0][5]
+
+## images/balloon.png
+
+By Jakub Młokosiewicz, [CC-BY-SA 3.0][5]
+
 [1]: https://opengameart.org/content/generic-8-bit-jrpg-soundtrack
 [2]: http://creativecommons.org/licenses/by/3.0/
 [3]: https://opengameart.org/content/bow-and-arrow-spritesheet
 [4]: https://creativecommons.org/publicdomain/zero/1.0/
+[5]: https://creativecommons.org/licenses/by-sa/3.0/

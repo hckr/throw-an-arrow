@@ -60,7 +60,7 @@ function Bow(pos_y) {
     this.state = BowState.UNLOADED;
     this.pos_y = pos_y,
     this.pos_y_min = 0,
-    this.pos_y_max = canvas_height - this.frame_height;
+    this.pos_y_max = canvas_height - bow_frame_height;
     this.strain_promise = null;
 }
 
@@ -143,9 +143,7 @@ let bow_frame_width = 35,
 let arrow_image = new Image();
 arrow_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAFBAMAAACz2AE9AAAAElBMVEVjb2yzekHAhkmVlaLh0azs3LchNeVpAAAAAXRSTlMAQObYZgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAwSURBVAjXYwh1ZQABZmMg4RqqJCgoKGxsbGzA4OKiKKSkCGIbA9kgJSA2AwyA1AMAyOkF497zJPwAAAAASUVORK5CYII=';
 let arrow_width = 22,
-    arrow_height = 5,
-    arrowhead_width = 9
-    arrowhead_x = arrow_width - arrowhead_width;
+    arrow_height = 5;
 
 let balloon_image = new Image();
 balloon_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAoAgMAAACDXzJIAAAACVBMVEUAAGcAAAD/AABz6q9GAAAAAXRSTlMAQObYZgAAAFJJREFUCNdjYFjAAARMK0Ak1yoEqbWqAY1ctWoBMsnUACK5ICQDErsBIYtMAsWB5qCQYLvgJNANTECjA8CkAAMjVjKAgRVIOjCwwEmICDEqQSQADn4qw55gBtoAAAAASUVORK5CYII=';
@@ -154,7 +152,7 @@ balloon_frame_height = 40;
 
 function Level1(onlevelend) {
     this.background_color = '#33f';
-    this.arrows_limit = 10;
+    this.arrows_limit = 15;
     this.balloons = [];
     for (let x = 0; x < 200; x += 12) {
         this.balloons.push({
@@ -203,19 +201,79 @@ Level1.prototype.update = function(arrows) {
     }
 }
 
+function Level2(onlevelend) {
+    this.background_color = '#33f';
+    this.arrows_limit = 20;
+    this.balloons = [];
+    let modifier = 100;
+    for (let x = 0; x < 200; x += 15) {
+        this.balloons.push({
+            x: canvas_width - 20 - x,
+            y: canvas_height + Math.abs(x - modifier),
+            speed: Math.random() > 0.5 ? 2 : 3
+        });
+        modifier += 15;
+    }
+    this.onlevelend = onlevelend;
+}
 
-function construct_first_level(onlevelend) {
-    return new Level1(onlevelend);
+Level2.prototype.drawOn = function(ctx) {
+    for (let balloon of this.balloons) {
+        if (balloon.pierced) {
+            ctx.drawImage(balloon_image, balloon_frame_width, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+        } else {
+            ctx.drawImage(balloon_image, 0, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+        }
+    }
+}
+
+Level2.prototype.update = function(arrows) {
+    this.balloons = this.balloons.filter(balloon => {
+        for (let arrow of arrows) {
+            let y_dist = arrow.y - balloon.y,
+                x_dist = arrow.x - balloon.x;
+            if (!balloon.pierced &&
+                y_dist > -3 && y_dist < balloon_frame_height - 15 &&
+                x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
+            {
+                balloon.pierced = true;
+                break;
+            }
+        }
+        if (balloon.pierced) {
+            balloon.y += 4;
+        } else {
+            balloon.y -= balloon.speed;
+            if (balloon.y < -balloon_frame_height) {
+                balloon.y += canvas_height + balloon_frame_height;
+            }
+        }
+        return !(balloon.pierced && balloon.y > (canvas_height + balloon_frame_height));
+    });
+    if (this.balloons.length == 0) {
+        onlevelend(true);
+    }
+}
+
+
+let levels_count = 2;
+
+function construct_level(n, onlevelend) {
+    switch (n) {
+    case 1:
+        return new Level1(onlevelend);
+    case 2:
+        return new Level2(onlevelend);
+    }
 }
 
 let mouse_down = false;
 
 c.addEventListener('mousedown', e => {
-    mouse_down = true;
-
     switch (e.which) {
     case 1:
         bow.strain();
+        mouse_down = true;
         break;
     case 3:
         if (arrows_remaining--) {
@@ -226,10 +284,9 @@ c.addEventListener('mousedown', e => {
 });
 
 c.addEventListener('mouseup', e => {
-    mouse_down = false;
-
     if (e.which == 1) {
         bow.release_arrow(add_arrow);
+        mouse_down = false;
     }
 });
 
@@ -243,6 +300,7 @@ c.addEventListener('mousemove', e => {
 let bow = new Bow(30),
     arrows_remaining = 0,
     arrows = [],
+    level_n,
     level,
     last_arrow_timeout = null;
 
@@ -256,7 +314,15 @@ function add_arrow(arrow) {
 function onlevelend(success) {
     clearTimeout(last_arrow_timeout);
     last_arrow_timeout = null;
-    level = construct_first_level(onlevelend);
+    if (success) {
+        ++level_n;
+        if (level_n > levels_count) {
+            level_n = 1;
+        }
+    } else {
+        level_n = 1;
+    }
+    level = construct_level(level_n, onlevelend);
     arrows_remaining = level.arrows_limit;
 }
 
@@ -284,7 +350,7 @@ function update() {
     setTimeout(update, 20);
 }
 
-onlevelend();
+onlevelend(false);
 update();
 draw();
 

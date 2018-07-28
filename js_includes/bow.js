@@ -12,7 +12,7 @@ function Bow(pos_y) {
     this.state = BowState.UNLOADED;
     this.pos_y = pos_y,
     this.pos_y_min = 0,
-    this.pos_y_max = canvas_height - this.frame_height;
+    this.pos_y_max = canvas_height - bow_frame_height;
     this.strain_promise = null;
 }
 

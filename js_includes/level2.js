@@ -2,14 +2,14 @@ function Level2(onlevelend) {
     this.background_color = '#33f';
     this.arrows_limit = 25;
     this.balloons = [];
-    let modifier = 100;
+    let faster = true;
     for (let x = 0; x < 200; x += 15) {
         this.balloons.push({
             x: canvas_width - 20 - x,
-            y: canvas_height + Math.abs(x - modifier),
-            speed: Math.random() > 0.5 ? 2 : 3
+            y: canvas_height + 150,
+            speed: faster ? 3 : 2
         });
-        modifier += 15;
+        faster = !faster;
     }
     this.onlevelend = onlevelend;
 }

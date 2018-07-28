@@ -8,11 +8,8 @@ let BowState = Object.freeze({
 });
 
 function Bow(pos_y) {
-    this.image = bow_image;
     this.frame = 0;
     this.state = BowState.UNLOADED;
-    this.frame_width = 35;
-    this.frame_height = 45;
     this.pos_y = pos_y,
     this.pos_y_min = 0,
     this.pos_y_max = canvas_height - this.frame_height;
@@ -81,8 +78,8 @@ Bow.prototype.move_y = function(diff) {
 }
 
 Bow.prototype.drawOn = function(ctx) {
-    ctx.drawImage(this.image, (this.frame % 6) * this.frame_width, ((this.frame / 6) | 0) * this.frame_height, this.frame_width, this.frame_height,
-                  0, this.pos_y, this.frame_width, this.frame_height);
+    ctx.drawImage(bow_image, (this.frame % 6) * bow_frame_width, ((this.frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
+                  0, this.pos_y, bow_frame_width, bow_frame_height);
 
     if (this.state == BowState.STRAINED) {
         console.log('test');

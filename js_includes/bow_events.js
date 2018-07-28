@@ -8,7 +8,9 @@ c.addEventListener('mousedown', e => {
         bow.strain();
         break;
     case 3:
-        bow.load_arrow();
+        if (arrows_remaining--) {
+            bow.load_arrow();
+        }
         break;
     }
 });
@@ -17,7 +19,7 @@ c.addEventListener('mouseup', e => {
     mouse_down = false;
 
     if (e.which == 1) {
-        bow.release_arrow(arrow => arrows.push(arrow));
+        bow.release_arrow(add_arrow);
     }
 });
 

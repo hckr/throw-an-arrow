@@ -56,11 +56,8 @@ let BowState = Object.freeze({
 });
 
 function Bow(pos_y) {
-    this.image = bow_image;
     this.frame = 0;
     this.state = BowState.UNLOADED;
-    this.frame_width = 35;
-    this.frame_height = 45;
     this.pos_y = pos_y,
     this.pos_y_min = 0,
     this.pos_y_max = canvas_height - this.frame_height;
@@ -129,8 +126,8 @@ Bow.prototype.move_y = function(diff) {
 }
 
 Bow.prototype.drawOn = function(ctx) {
-    ctx.drawImage(this.image, (this.frame % 6) * this.frame_width, ((this.frame / 6) | 0) * this.frame_height, this.frame_width, this.frame_height,
-                  0, this.pos_y, this.frame_width, this.frame_height);
+    ctx.drawImage(bow_image, (this.frame % 6) * bow_frame_width, ((this.frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
+                  0, this.pos_y, bow_frame_width, bow_frame_height);
 
     if (this.state == BowState.STRAINED) {
         console.log('test');
@@ -140,18 +137,24 @@ Bow.prototype.drawOn = function(ctx) {
 
 let bow_image = new Image();
 bow_image.src = 'data:image/png;base64,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';
+let bow_frame_width = 35,
+    bow_frame_height = 45;
 
 let arrow_image = new Image();
 arrow_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAFBAMAAACz2AE9AAAAElBMVEVjb2yzekHAhkmVlaLh0azs3LchNeVpAAAAAXRSTlMAQObYZgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAwSURBVAjXYwh1ZQABZmMg4RqqJCgoKGxsbGzA4OKiKKSkCGIbA9kgJSA2AwyA1AMAyOkF497zJPwAAAAASUVORK5CYII=';
+let arrow_width = 22,
+    arrow_height = 5,
+    arrowhead_width = 9
+    arrowhead_x = arrow_width - arrowhead_width;
 
 let balloon_image = new Image();
 balloon_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAoAgMAAACDXzJIAAAACVBMVEUAAGcAAAD/AABz6q9GAAAAAXRSTlMAQObYZgAAAFJJREFUCNdjYFjAAARMK0Ak1yoEqbWqAY1ctWoBMsnUACK5ICQDErsBIYtMAsWB5qCQYLvgJNANTECjA8CkAAMjVjKAgRVIOjCwwEmICDEqQSQADn4qw55gBtoAAAAASUVORK5CYII=';
-
 let balloon_frame_width = 10,
 balloon_frame_height = 40;
 
-
 function Level1(onlevelend) {
+    this.background_color = '#33f';
+    this.arrows_limit = 10;
     this.balloons = [];
     for (let x = 0; x < 200; x += 12) {
         this.balloons.push({
@@ -205,9 +208,6 @@ function construct_first_level(onlevelend) {
     return new Level1(onlevelend);
 }
 
-
-let bow = new Bow(30);
-
 let mouse_down = false;
 
 c.addEventListener('mousedown', e => {
@@ -218,7 +218,9 @@ c.addEventListener('mousedown', e => {
         bow.strain();
         break;
     case 3:
-        bow.load_arrow();
+        if (arrows_remaining--) {
+            bow.load_arrow();
+        }
         break;
     }
 });
@@ -227,7 +229,7 @@ c.addEventListener('mouseup', e => {
     mouse_down = false;
 
     if (e.which == 1) {
-        bow.release_arrow(arrow => arrows.push(arrow));
+        bow.release_arrow(add_arrow);
     }
 });
 
@@ -238,25 +240,38 @@ c.addEventListener('mousemove', e => {
 });
 
 
-let arrow_width = 22,
-    arrow_height = 5;
+let bow = new Bow(30),
+    arrows_remaining = 0,
+    arrows = [],
+    level,
+    last_arrow_timeout = null;
 
-let arrows = [];
-
-let level;
+function add_arrow(arrow) {
+    arrows.push(arrow);
+    if (!arrows_remaining) {
+        last_arrow_timeout = setTimeout(_ => onlevelend(false), 5000);
+    }
+}
 
 function onlevelend(success) {
+    clearTimeout(last_arrow_timeout);
+    last_arrow_timeout = null;
     level = construct_first_level(onlevelend);
+    arrows_remaining = level.arrows_limit;
 }
 
 function draw() {
-    ctx.fillStyle = '#33f';
+    ctx.fillStyle = level.background_color;
     ctx.fillRect(0, 0, canvas_width, canvas_height);
     bow.drawOn(ctx);
     for (let arrow of arrows) {
         ctx.drawImage(arrow_image, arrow.x, arrow.y);
     }
     level.drawOn(ctx);
+    ctx.fillStyle = '#e1d1ac';
+    for (let pos_x = canvas_width - 7, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
+        ctx.fillRect(pos_x, 10, 1, 6);
+    }
     requestAnimationFrame(draw);
 }
 
@@ -270,7 +285,6 @@ function update() {
 }
 
 onlevelend();
-console.log(level);
 update();
 draw();
 

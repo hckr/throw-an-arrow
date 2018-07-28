@@ -179,7 +179,7 @@ Level1.prototype.update = function(arrows) {
             let y_dist = arrow.y - balloon.y,
                 x_dist = arrow.x - balloon.x;
             if (!balloon.pierced &&
-                y_dist > -3 && y_dist < balloon_frame_height - 15 &&
+                y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
                 x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
             {
                 balloon.pierced = true;
@@ -233,7 +233,7 @@ Level2.prototype.update = function(arrows) {
             let y_dist = arrow.y - balloon.y,
                 x_dist = arrow.x - balloon.x;
             if (!balloon.pierced &&
-                y_dist > -3 && y_dist < balloon_frame_height - 15 &&
+                y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
                 x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
             {
                 balloon.pierced = true;
@@ -276,7 +276,8 @@ c.addEventListener('mousedown', e => {
         mouse_down = true;
         break;
     case 3:
-        if (arrows_remaining--) {
+        if (arrows_remaining) {
+            --arrows_remaining;
             bow.load_arrow();
         }
         break;

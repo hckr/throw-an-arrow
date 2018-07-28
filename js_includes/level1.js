@@ -27,7 +27,7 @@ Level1.prototype.update = function(arrows) {
             let y_dist = arrow.y - balloon.y,
                 x_dist = arrow.x - balloon.x;
             if (!balloon.pierced &&
-                y_dist > -3 && y_dist < balloon_frame_height - 15 &&
+                y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
                 x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
             {
                 balloon.pierced = true;

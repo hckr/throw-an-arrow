@@ -1,5 +1,5 @@
 function Level2(onlevelend) {
-    this.background_color = '#33f';
+    this.bg_image = sky_image;
     this.arrows_limit = 25;
     this.balloons = [];
     let faster = true;

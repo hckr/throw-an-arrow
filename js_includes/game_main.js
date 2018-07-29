@@ -33,8 +33,7 @@ function onlevelend(success) {
 }
 
 function draw() {
-    ctx.fillStyle = level.background_color;
-    ctx.fillRect(0, 0, canvas_width, canvas_height);
+    ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
     bow.drawOn(ctx);
     for (let arrow of arrows) {
         ctx.drawImage(arrow_image, arrow.x, arrow.y);

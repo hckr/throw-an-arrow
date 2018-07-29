@@ -16,8 +16,14 @@ By Agnieszka Młokosiewicz, [CC-BY-SA 3.0][5]
 
 By Jakub Młokosiewicz, [CC-BY-SA 3.0][5]
 
+## images/sky.png
+
+Adapted from the work of [bart][6], [CC-BY 3.0][2].
+
+
 [1]: https://opengameart.org/content/generic-8-bit-jrpg-soundtrack
 [2]: http://creativecommons.org/licenses/by/3.0/
 [3]: https://opengameart.org/content/bow-and-arrow-spritesheet
 [4]: https://creativecommons.org/publicdomain/zero/1.0/
 [5]: https://creativecommons.org/licenses/by-sa/3.0/
+[6]: https://opengameart.org/content/sky-backdrop

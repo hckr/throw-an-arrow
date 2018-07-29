@@ -43,6 +43,9 @@ function draw() {
     for (let pos_x = canvas_width - 7, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
         ctx.fillRect(pos_x, 10, 1, 6);
     }
+    if (debug) {
+        console.log(check_colors_and_get_count());
+    }
     requestAnimationFrame(draw);
 }
 

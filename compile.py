@@ -73,7 +73,7 @@ def replace_colorizedfontdatauri(match):
     data[..., :-1][white_areas.T] = rgb
     im2 = Image.fromarray(data)
     buffer = BytesIO()
-    im2.save(buffer, format='PNG')
+    im2.save(buffer, format='PNG', optimize=True)
     return 'data:image/png;base64,' + base64.b64encode(buffer.getvalue()).decode('utf-8')
 
 

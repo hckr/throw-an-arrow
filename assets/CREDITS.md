@@ -14,7 +14,7 @@ A cropped version with decreased quality (due to file size constraint) of ["Ball
 
 ## sounds/win.ogg, sounds/lose.ogg
 
-A cropped versions with decreased quality (due to file size constraint) of ["Jingle_Achievement_01" and "Jingle_Lose_00" by Little Robot Sound Factory][11], [CC-BY 3.0][2].
+Cropped versions with decreased quality (due to file size constraint) of ["Jingle_Achievement_01" and "Jingle_Lose_00" by Little Robot Sound Factory][11], [CC-BY 3.0][2].
 
 ## images/bow.png, images/arrow.png
 
@@ -22,11 +22,11 @@ Adapted from the work of [johnnytal][3], [CC0 1.0][4].
 
 ## images/violet.png
 
-By Agnieszka Młokosiewicz, [CC-BY-SA 3.0][5].
+Adapted from the work of Agnieszka Młokosiewicz, [CC-BY-SA 3.0][5].
 
 ## images/balloon.png
 
-By Jakub Młokosiewicz, [CC-BY-SA 3.0][5].
+Original work, [CC-BY-SA 3.0][5].
 
 ## images/sky.png
 

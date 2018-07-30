@@ -20,6 +20,10 @@ By Jakub Młokosiewicz, [CC-BY-SA 3.0][5]
 
 Adapted from the work of [bart][6], [CC-BY 3.0][2].
 
+## fonts/*
+
+Fonts from [Kenney][7] converted to bitmap using [FontBuilder][8].
+
 
 [1]: https://opengameart.org/content/generic-8-bit-jrpg-soundtrack
 [2]: http://creativecommons.org/licenses/by/3.0/
@@ -27,3 +31,5 @@ Adapted from the work of [bart][6], [CC-BY 3.0][2].
 [4]: https://creativecommons.org/publicdomain/zero/1.0/
 [5]: https://creativecommons.org/licenses/by-sa/3.0/
 [6]: https://opengameart.org/content/sky-backdrop
+[7]: https://kenney.nl/assets/kenney-fonts
+[8]: https://github.com/andryblack/fontbuilder

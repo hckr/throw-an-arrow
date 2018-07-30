@@ -2,8 +2,9 @@
 // include_once{images.js}
 // include_once{levels.js}
 // include_once{bow_events.js}
+// include_once{text.js}
 
-let bow = new Bow(30),
+let bow = new Bow(80),
     arrows_remaining = 0,
     arrows = [],
     level_n,
@@ -39,13 +40,18 @@ function draw() {
         ctx.drawImage(arrow_image, arrow.x, arrow.y);
     }
     level.drawOn(ctx);
+    status_font.draw(ctx, 5, 20, 'score');
+    status_font.draw(ctx, 35, 20, '000000');
+    status_font.draw(ctx, canvas_width - 35, 20, 'arrows');
     ctx.fillStyle = '#e1d1ac';
-    for (let pos_x = canvas_width - 7, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
-        ctx.fillRect(pos_x, 10, 1, 6);
+    for (let pos_x = canvas_width - 42, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
+        ctx.fillRect(pos_x, 12, 1, 8);
     }
     if (debug) {
-        console.log(check_colors_and_get_count());
+        let count = check_colors_and_get_count();
+        status_font.draw(ctx, canvas_width - 70, 45, `used colors: ${count}`);
     }
+
     requestAnimationFrame(draw);
 }
 

@@ -355,8 +355,37 @@ c.addEventListener('mousemove', e => {
     }
 });
 
+function TextDrawer(image, layout, line_height) {
+    this.image = image;
+    this.layout = layout;
+    this.line_height = line_height;
+}
 
-let bow = new Bow(30),
+TextDrawer.prototype.draw = function(ctx, x, y, text) {
+    text = ('' + text).toUpperCase();
+    let pos_x = x,
+        pos_y = y;
+    for (let char of text) {
+        let layout = this.layout[char];
+        if (layout) {
+            let [cx, cy, cw, ch] = layout['rect'];
+            let [ox, oy] = layout['offset'];
+            ctx.drawImage(this.image, cx, cy, cw, ch, pos_x - ox, pos_y - oy, cw, ch);
+            pos_x += layout['advance'];
+        } else if (char == '\n') {
+            pos_x = x;
+            pos_y += this.line_height;
+        }
+    }
+}
+
+let status_font_image = new Image();
+status_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI0AAAAICAYAAADEI3zOAAABO0lEQVR4nO1XyxXDMAjDfd5/ki7TETpJemj8HiEIkJ3coktKEZ/YtXDb9/PeRKSJyCZ/6M8a9vtht92uxER+m6cpHuotqo386D2yuMiP+Bkvex/2faOaXt7K+p9qvYLiDx646PvTKoZVEcsZtocoRozPUyqkDhEH1cz8yLaonHDNZU/xrK17zlR9BYf16ZCmSGQBZvNn8q/0FMUzOa/enCxf1D86lLf1UPnRDKDZP7uAaH57941I1e44XdWcV9dn7oBXIlLFE7cnjVjpRpcqj4ua8EYhiqcvaQCVcUQtHFk/g6cWSKErVwQdZ68bSGVtDW0f6nY5bqaHVdlmpLeqZNm4qYwjBuz4WM23EsvsQZQLruH494TUJELGs36PH9Wt9KFPxIx/cKIRyPbE5EBrMqOgKLd9isnP7qP8ACITjmUmA4ZKAAAAAElFTkSuQmCC';
+let layout = {' ': {advance: 2, rect: [0, 8, 0, 0], offset: [0, 0]}, '!': {advance: 2, rect: [0, 0, 1, 8], offset: [0, 8]}, '0': {advance: 5, rect: [1, 0, 4, 8], offset: [0, 8]}, '1': {advance: 3, rect: [5, 0, 2, 8], offset: [0, 8]}, '2': {advance: 5, rect: [7, 0, 4, 8], offset: [0, 8]}, '3': {advance: 5, rect: [11, 0, 4, 8], offset: [0, 8]}, '4': {advance: 5, rect: [15, 0, 4, 8], offset: [0, 8]}, '5': {advance: 5, rect: [19, 0, 4, 8], offset: [0, 8]}, '6': {advance: 5, rect: [23, 0, 4, 8], offset: [0, 8]}, '7': {advance: 5, rect: [27, 0, 4, 8], offset: [0, 8]}, '8': {advance: 5, rect: [31, 0, 4, 8], offset: [0, 8]}, '9': {advance: 5, rect: [35, 0, 4, 8], offset: [0, 8]}, ':': {advance: 2, rect: [39, 2, 1, 4], offset: [0, 6]}, A: {advance: 5, rect: [40, 0, 4, 8], offset: [0, 8]}, B: {advance: 5, rect: [44, 0, 4, 8], offset: [0, 8]}, C: {advance: 5, rect: [48, 0, 4, 8], offset: [0, 8]}, D: {advance: 5, rect: [52, 0, 4, 8], offset: [0, 8]}, E: {advance: 5, rect: [56, 0, 4, 8], offset: [0, 8]}, F: {advance: 5, rect: [60, 0, 4, 8], offset: [0, 8]}, G: {advance: 5, rect: [64, 0, 4, 8], offset: [0, 8]}, H: {advance: 5, rect: [68, 0, 4, 8], offset: [0, 8]}, I: {advance: 2, rect: [72, 0, 1, 8], offset: [0, 8]}, J: {advance: 4, rect: [73, 0, 3, 8], offset: [0, 8]}, K: {advance: 5, rect: [76, 0, 4, 8], offset: [0, 8]}, L: {advance: 4, rect: [80, 0, 3, 8], offset: [0, 8]}, M: {advance: 6, rect: [83, 0, 5, 8], offset: [0, 8]}, N: {advance: 5, rect: [88, 0, 4, 8], offset: [0, 8]}, O: {advance: 5, rect: [92, 0, 4, 8], offset: [0, 8]}, P: {advance: 5, rect: [96, 0, 4, 8], offset: [0, 8]}, Q: {advance: 5, rect: [100, 0, 4, 8], offset: [0, 8]}, R: {advance: 5, rect: [104, 0, 4, 8], offset: [0, 8]}, S: {advance: 5, rect: [108, 0, 4, 8], offset: [0, 8]}, T: {advance: 4, rect: [112, 0, 3, 8], offset: [0, 8]}, U: {advance: 5, rect: [115, 0, 4, 8], offset: [0, 8]}, V: {advance: 6, rect: [119, 0, 5, 8], offset: [0, 8]}, W: {advance: 6, rect: [124, 0, 5, 8], offset: [0, 8]}, X: {advance: 5, rect: [129, 0, 4, 8], offset: [0, 8]}, Y: {advance: 5, rect: [133, 0, 4, 8], offset: [0, 8]}, Z: {advance: 5, rect: [137, 0, 4, 8], offset: [0, 8]}};
+let status_font = new TextDrawer(status_font_image, layout, 20);
+
+
+let bow = new Bow(80),
     arrows_remaining = 0,
     arrows = [],
     level_n,
@@ -392,13 +421,18 @@ function draw() {
         ctx.drawImage(arrow_image, arrow.x, arrow.y);
     }
     level.drawOn(ctx);
+    status_font.draw(ctx, 5, 20, 'score');
+    status_font.draw(ctx, 35, 20, '000000');
+    status_font.draw(ctx, canvas_width - 35, 20, 'arrows');
     ctx.fillStyle = '#e1d1ac';
-    for (let pos_x = canvas_width - 7, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
-        ctx.fillRect(pos_x, 10, 1, 6);
+    for (let pos_x = canvas_width - 42, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
+        ctx.fillRect(pos_x, 12, 1, 8);
     }
     if (debug) {
-        console.log(check_colors_and_get_count());
+        let count = check_colors_and_get_count();
+        status_font.draw(ctx, canvas_width - 70, 45, `used colors: ${count}`);
     }
+
     requestAnimationFrame(draw);
 }
 

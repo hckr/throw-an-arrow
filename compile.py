@@ -4,7 +4,12 @@ import base64
 import tempfile
 import os
 import subprocess
+import json
+import xmltodict
+import numpy as np
 from termcolor import colored
+from PIL import Image
+from io import BytesIO
 
 
 with open('main.js') as f:
@@ -43,8 +48,39 @@ def replace_datauri(match):
     return 'data:{};base64,{}'.format(match.group(1), base64.b64encode(contents).decode('utf-8'))
 
 
+def replace_ghltojsobj(match):
+    data = {}
+    with open(match.group(1)) as f:
+        xml = xmltodict.parse(f.read())
+        for char in xml['font']['chars']['char']:
+            data[char['@id']] = {
+                'advance': int(char['@advance']),
+                'rect': [int(x) for x in char['@rect'].split()],
+                'offset': [int(x) for x in char['@offset'].split()]
+            }
+    return re.sub(r'"([a-zA-Z]+)"', r'\1', json.dumps(data)).replace('"', "'")
+
+
+def replace_colorizedfontdatauri(match):
+    h = match.group(1)
+    rgb = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+    # https://stackoverflow.com/a/3753428/5114473
+    im = Image.open(match.group(2))
+    im = im.convert('RGBA')
+    data = np.array(im)
+    red, green, blue, alpha = data.T
+    white_areas = (red == 255) & (blue == 255) & (green == 255)
+    data[..., :-1][white_areas.T] = rgb
+    im2 = Image.fromarray(data)
+    buffer = BytesIO()
+    im2.save(buffer, format='PNG')
+    return 'data:image/png;base64,' + base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+
 code = re.sub(r'#base64{([a-z0-9/\.-_]+)}', replace_base64, code)
 code = re.sub(r'#datauri{([a-z/]+),([a-z0-9/\.-_]+)}', replace_datauri, code)
+code = re.sub(r'{/\*\s*ghltojsobj{([a-z0-9/\.-_]+)}\s*\*/}', replace_ghltojsobj, code)
+code = re.sub(r'#colorizedfontdatauri{([0-9a-f]{6}),([a-z0-9/\.-_]+)}', replace_colorizedfontdatauri, code)
 
 raw_len = len(code)
 

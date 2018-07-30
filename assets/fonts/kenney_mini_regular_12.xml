@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font type="GHL">
+ <description family="Kenney Mini" size="12" style="Regular"/>
+ <metrics ascender="12" descender="-3" height="15"/>
+ <texture height="8" file="kenney_mini_regular_12.png" width="141"/>
+ <chars>
+  <char id=" " advance="2" offset="0 0" rect="0 8 0 0"/>
+  <char id="!" advance="2" offset="0 8" rect="0 0 1 8"/>
+  <char id="0" advance="5" offset="0 8" rect="1 0 4 8"/>
+  <char id="1" advance="3" offset="0 8" rect="5 0 2 8"/>
+  <char id="2" advance="5" offset="0 8" rect="7 0 4 8"/>
+  <char id="3" advance="5" offset="0 8" rect="11 0 4 8"/>
+  <char id="4" advance="5" offset="0 8" rect="15 0 4 8"/>
+  <char id="5" advance="5" offset="0 8" rect="19 0 4 8"/>
+  <char id="6" advance="5" offset="0 8" rect="23 0 4 8"/>
+  <char id="7" advance="5" offset="0 8" rect="27 0 4 8"/>
+  <char id="8" advance="5" offset="0 8" rect="31 0 4 8"/>
+  <char id="9" advance="5" offset="0 8" rect="35 0 4 8"/>
+  <char id=":" advance="2" offset="0 6" rect="39 2 1 4"/>
+  <char id="A" advance="5" offset="0 8" rect="40 0 4 8"/>
+  <char id="B" advance="5" offset="0 8" rect="44 0 4 8"/>
+  <char id="C" advance="5" offset="0 8" rect="48 0 4 8"/>
+  <char id="D" advance="5" offset="0 8" rect="52 0 4 8"/>
+  <char id="E" advance="5" offset="0 8" rect="56 0 4 8"/>
+  <char id="F" advance="5" offset="0 8" rect="60 0 4 8"/>
+  <char id="G" advance="5" offset="0 8" rect="64 0 4 8"/>
+  <char id="H" advance="5" offset="0 8" rect="68 0 4 8"/>
+  <char id="I" advance="2" offset="0 8" rect="72 0 1 8"/>
+  <char id="J" advance="4" offset="0 8" rect="73 0 3 8"/>
+  <char id="K" advance="5" offset="0 8" rect="76 0 4 8"/>
+  <char id="L" advance="4" offset="0 8" rect="80 0 3 8"/>
+  <char id="M" advance="6" offset="0 8" rect="83 0 5 8"/>
+  <char id="N" advance="5" offset="0 8" rect="88 0 4 8"/>
+  <char id="O" advance="5" offset="0 8" rect="92 0 4 8"/>
+  <char id="P" advance="5" offset="0 8" rect="96 0 4 8"/>
+  <char id="Q" advance="5" offset="0 8" rect="100 0 4 8"/>
+  <char id="R" advance="5" offset="0 8" rect="104 0 4 8"/>
+  <char id="S" advance="5" offset="0 8" rect="108 0 4 8"/>
+  <char id="T" advance="4" offset="0 8" rect="112 0 3 8"/>
+  <char id="U" advance="5" offset="0 8" rect="115 0 4 8"/>
+  <char id="V" advance="6" offset="0 8" rect="119 0 5 8"/>
+  <char id="W" advance="6" offset="0 8" rect="124 0 5 8"/>
+  <char id="X" advance="5" offset="0 8" rect="129 0 4 8"/>
+  <char id="Y" advance="5" offset="0 8" rect="133 0 4 8"/>
+  <char id="Z" advance="5" offset="0 8" rect="137 0 4 8"/>
+ </chars>
+</font>

@@ -57,8 +57,8 @@ Bow.prototype.release_arrow = function(add_arrow) {
             y: this.pos_y + 20
         });
         let that = this;
+        play(shoot_sound);
         (function restore_chord() {
-            shoot_audio.play();
             setTimeout(_ => {
                 if (--that.frame > 12) {
                     restore_chord();

@@ -3,6 +3,7 @@
 // include_once{levels.js}
 // include_once{bow_events.js}
 // include_once{text.js}
+// include_once{sounds.js}
 
 let bow = new Bow(80),
     arrows_remaining = 0,
@@ -22,11 +23,15 @@ function onlevelend(success) {
     clearTimeout(last_arrow_timeout);
     last_arrow_timeout = null;
     if (success) {
+        play(win_sound);
         ++level_n;
         if (level_n > levels_count) {
             level_n = 1;
         }
     } else {
+        if (success === false) {
+            play(lose_sound);
+        }
         level_n = 1;
     }
     level = construct_level(level_n, onlevelend);
@@ -64,6 +69,6 @@ function update() {
     setTimeout(update, 20);
 }
 
-onlevelend(false);
+onlevelend(); // argument undefined on purpose
 update();
 draw();

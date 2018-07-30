@@ -12,6 +12,10 @@ A cropped version with decreased quality (due to file size constraint) of ["Bow 
 
 A cropped version with decreased quality (due to file size constraint) of ["Balloon-Burst-07.wav" by Gniffelbaf][10], [CC-BY-SA 3.0][5].
 
+## sounds/win.ogg, sounds/lose.ogg
+
+A cropped versions with decreased quality (due to file size constraint) of ["Jingle_Achievement_01" and "Jingle_Lose_00" by Little Robot Sound Factory][11], [CC-BY 3.0][2].
+
 ## images/bow.png, images/arrow.png
 
 Adapted from the work of [johnnytal][3], [CC0 1.0][4].
@@ -43,3 +47,4 @@ Fonts from [Kenney][7] converted to bitmap using [FontBuilder][8].
 [8]: https://github.com/andryblack/fontbuilder
 [9]: https://opengameart.org/content/bow-arrow-shot
 [10]: https://freesound.org/people/Gniffelbaf/sounds/82121/
+[11]: https://opengameart.org/content/8-bit-sound-effects-library

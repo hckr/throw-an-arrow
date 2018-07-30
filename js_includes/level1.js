@@ -1,3 +1,6 @@
+// include_once{images.js}
+// include_once{sounds.js}
+
 function Level1(onlevelend) {
     this.bg_image = sky_image;
     this.arrows_limit = 18;
@@ -30,6 +33,7 @@ Level1.prototype.update = function(arrows) {
                 y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
                 x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
             {
+                play(burst_sound);
                 balloon.pierced = true;
                 break;
             }

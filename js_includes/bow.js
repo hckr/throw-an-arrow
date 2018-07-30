@@ -1,4 +1,5 @@
 // include_once{images.js}
+// include_once{sounds.js}
 
 let BowState = Object.freeze({
     UNLOADED: 1,
@@ -57,6 +58,7 @@ Bow.prototype.release_arrow = function(add_arrow) {
         });
         let that = this;
         (function restore_chord() {
+            shoot_audio.play();
             setTimeout(_ => {
                 if (--that.frame > 12) {
                     restore_chord();

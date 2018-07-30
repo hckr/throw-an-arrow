@@ -20,7 +20,9 @@ Bow.prototype.load_arrow = function() {
     if (this.state == BowState.UNLOADED) {
         this.frame = 1;
         this.state = BowState.LOADED;
+        return true;
     }
+    return false;
 }
 
 Bow.prototype.strain = function() {

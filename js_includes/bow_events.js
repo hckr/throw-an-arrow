@@ -8,8 +8,9 @@ c.addEventListener('mousedown', e => {
         break;
     case 3:
         if (arrows_remaining) {
-            --arrows_remaining;
-            bow.load_arrow();
+            if (bow.load_arrow()) { // returns false if cannot load
+                --arrows_remaining;
+            }
         }
         break;
     }

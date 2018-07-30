@@ -121,7 +121,9 @@ Bow.prototype.load_arrow = function() {
     if (this.state == BowState.UNLOADED) {
         this.frame = 1;
         this.state = BowState.LOADED;
+        return true;
     }
+    return false;
 }
 
 Bow.prototype.strain = function() {
@@ -335,8 +337,9 @@ c.addEventListener('mousedown', e => {
         break;
     case 3:
         if (arrows_remaining) {
-            --arrows_remaining;
-            bow.load_arrow();
+            if (bow.load_arrow()) { // returns false if cannot load
+                --arrows_remaining;
+            }
         }
         break;
     }

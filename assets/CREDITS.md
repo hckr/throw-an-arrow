@@ -32,6 +32,14 @@ Original work, [CC-BY-SA 3.0][5].
 
 Adapted from the work of [bart][6], [CC-BY 3.0][2].
 
+## images/butterfly.png
+
+Adapted from the work of [Calciumtrice][12], [CC-BY 3.0][2].
+
+## images/bubble.png
+
+Adapted from the work of [second][13], [CC0 1.0][4].
+
 ## fonts/*
 
 Fonts from [Kenney][7] converted to bitmap using [FontBuilder][8].
@@ -48,3 +56,5 @@ Fonts from [Kenney][7] converted to bitmap using [FontBuilder][8].
 [9]: https://opengameart.org/content/bow-arrow-shot
 [10]: https://freesound.org/people/Gniffelbaf/sounds/82121/
 [11]: https://opengameart.org/content/8-bit-sound-effects-library
+[12]: https://opengameart.org/content/forest-monsters
+[13]: https://opengameart.org/content/2d-bubble-animation

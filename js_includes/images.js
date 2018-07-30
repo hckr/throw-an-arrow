@@ -26,3 +26,9 @@ let violet_pos_x = 0,
     violet_minion_pos_y = 64,
     violet_minion_width = 12,
     violet_minion_height = 13;
+
+let butterfly_image = new Image();
+butterfly_image.src = '#datauri{image/png,assets/images/butterfly.png}';
+
+let bubble_image = new Image();
+bubble_image.src = '#datauri{image/png,assets/images/bubble.png}';

@@ -44,7 +44,7 @@ function draw() {
     for (let arrow of arrows) {
         ctx.drawImage(arrow_image, arrow.x, arrow.y);
     }
-    level.drawOn(ctx);
+    level.draw_on(ctx);
     status_font.draw(ctx, 5, 20, 'score');
     status_font.draw(ctx, 35, 20, '000000');
     status_font.draw(ctx, canvas_width - 35, 20, 'arrows');

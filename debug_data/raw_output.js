@@ -221,173 +221,147 @@ let violet_pos_x = 0,
 
 
 
-function Level1(onlevelend) {
-    this.bg_image = sky_image;
-    this.arrows_limit = 18;
-    this.balloons = [];
-    for (let x = 0; x < 200; x += 12) {
-        this.balloons.push({
-            x: canvas_width - 20 - x,
-            y: canvas_height
+class BalloonLevelBase {
+    constructor(onlevelend, arrows_limit, balloons) {
+        this.arrows_limit = arrows_limit;
+        this.balloons = balloons;
+        this.onlevelend = onlevelend;
+
+        this.bg_image = sky_image;
+    }
+
+    draw_on(ctx) {
+        for (let balloon of this.balloons) {
+            if (balloon.pierced) {
+                ctx.drawImage(balloon_image, balloon_frame_width, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+            } else {
+                ctx.drawImage(balloon_image, 0, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+            }
+        }
+    }
+
+    update(arrows) {
+        this.balloons = this.balloons.filter(balloon => {
+            for (let arrow of arrows) {
+                let y_dist = arrow.y - balloon.y,
+                    x_dist = arrow.x - balloon.x;
+                if (!balloon.pierced &&
+                    y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
+                    x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
+                {
+                    play(burst_sound);
+                    balloon.pierced = true;
+                    break;
+                }
+            }
+            if (balloon.pierced) {
+                balloon.y += 4;
+            } else {
+                balloon.y -= balloon.speed;
+                if (balloon.y < -balloon_frame_height) {
+                    balloon.y += canvas_height + balloon_frame_height;
+                }
+            }
+            return !(balloon.pierced && balloon.y > (canvas_height + balloon_frame_height));
+        });
+        if (this.balloons.length == 0) {
+            onlevelend(true);
+        }
+    }
+}
+
+
+class Level1 extends BalloonLevelBase {
+    constructor(onlevelend) {
+        let balloons = [];
+        for (let x = 0; x < 200; x += 12) {
+            balloons.push({
+                x: canvas_width - 20 - x,
+                y: canvas_height,
+                speed: 2
+            });
+        }
+        super(onlevelend, 18, balloons);
+    }
+}
+
+
+
+class Level2 extends BalloonLevelBase {
+    constructor(onlevelend) {
+        let balloons = [],
+            faster = true;
+        for (let x = 0; x < 200; x += 15) {
+            balloons.push({
+                x: canvas_width - 20 - x,
+                y: canvas_height + 150,
+                speed: faster ? 3 : 2
+            });
+            faster = !faster;
+        }
+        super(onlevelend, 25, balloons);
+    }
+}
+
+
+
+
+class Level3 {
+    constructor(onlevelend) {
+        this.bg_image = sky_image;
+        this.arrows_limit = 30;
+        this.onlevelend = onlevelend;
+        this.violets = [];
+        this.violets.push({
+            x: canvas_width - violet_width - 20,
+            y: (Math.random() * (canvas_height - violet_height - 30) + 30) | 0,
+            health: 10
         });
     }
-    this.onlevelend = onlevelend;
-}
 
-Level1.prototype.drawOn = function(ctx) {
-    for (let balloon of this.balloons) {
-        if (balloon.pierced) {
-            ctx.drawImage(balloon_image, balloon_frame_width, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
-        } else {
-            ctx.drawImage(balloon_image, 0, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+    draw_on(ctx) {
+        for (let violet of this.violets) {
+            ctx.fillStyle = '#87238f';
+            let pos_y = violet.y - 12;
+            for (let pos_x = violet.x + 10, health_drawn = 0; health_drawn < violet.health; ++health_drawn, pos_x += 6) {
+                ctx.fillRect(pos_x, pos_y, 6, 3);
+            }
+            ctx.drawImage(violet_image, violet_pos_x, violet_pos_y, violet_width, violet_height, violet.x, violet.y, violet_width, violet_height);
         }
     }
-}
 
-Level1.prototype.update = function(arrows) {
-    this.balloons = this.balloons.filter(balloon => {
-        for (let arrow of arrows) {
-            let y_dist = arrow.y - balloon.y,
-                x_dist = arrow.x - balloon.x;
-            if (!balloon.pierced &&
-                y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
-                x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
-            {
-                play(burst_sound);
-                balloon.pierced = true;
-                break;
+    update(arrows) {
+        this.violets = this.violets.filter(violet => {
+            for (let arrow of arrows) {
+                let diff_y = (arrow.y + 2) - violet.y,
+                    diff_x = (arrow.x + arrow_width) - violet.x;
+                if ((diff_y >= -2 && diff_y <= 1 && diff_x >= 34 && diff_x <= 36) ||
+                    (diff_y >= 2 && diff_y <= 3 && diff_x >= 28 && diff_x <= 30) ||
+                    (diff_y >= 4 && diff_y <= 5 && diff_x >= 26 && diff_x <= 28) ||
+                    (diff_y >= 6 && diff_y <= 11 && diff_x >= 22 && diff_x <= 24) ||
+                    (diff_y >= 12 && diff_y <= 13 && diff_x >= 8 && diff_x <= 10) ||
+                    (diff_y >= 14 && diff_y <= 15 && diff_x >= 2 && diff_x <= 4) ||
+                    (diff_y >= 16 && diff_y <= 29 && diff_x >= 0 && diff_x <= 2) ||
+                    (diff_y >= 30 && diff_y <= 31 && diff_x >= 2 && diff_x <= 4) ||
+                    (diff_y >= 32 && diff_y <= 33 && diff_x >= 4 && diff_x <= 6) ||
+                    (diff_y >= 34 && diff_y <= 37 && diff_x >= 8 && diff_x <= 10) ||
+                    (diff_y >= 38 && diff_y <= 51 && diff_x >= 6 && diff_x <= 8) ||
+                    (diff_y >= 52 && diff_y <= 55 && diff_x >= 8 && diff_x <= 10) ||
+                    (diff_y >= 56 && diff_y <= 57 && diff_x >= 10 && diff_x <= 12) ||
+                    (diff_y >= 58 && diff_y <= 59 && diff_x >= 14 && diff_x <= 16) ||
+                    (diff_y >= 60 && diff_y <= 61 && diff_x >= 44 && diff_x <= 46) ||
+                    (diff_y >= 62 && diff_y <= 65 && diff_x >= 46 && diff_x <= 48))
+                {
+                    play(air_hit_sound);
+                    --violet.health;
+                    break;
+                }
             }
-        }
-        if (balloon.pierced) {
-            balloon.y += 4;
-        } else {
-            balloon.y -= 2;
-            if (balloon.y < -balloon_frame_height) {
-                balloon.y += canvas_height + balloon_frame_height;
-            }
-        }
-        return !(balloon.pierced && balloon.y > (canvas_height + balloon_frame_height));
-    });
-    if (this.balloons.length == 0) {
-        onlevelend(true);
-    }
-}
-
-
-
-
-function Level2(onlevelend) {
-    this.bg_image = sky_image;
-    this.arrows_limit = 25;
-    this.balloons = [];
-    let faster = true;
-    for (let x = 0; x < 200; x += 15) {
-        this.balloons.push({
-            x: canvas_width - 20 - x,
-            y: canvas_height + 150,
-            speed: faster ? 3 : 2
+            return !(violet.to_be_removed && violet.x > canvas_width);
         });
-        faster = !faster;
-    }
-    this.onlevelend = onlevelend;
-}
-
-Level2.prototype.drawOn = function(ctx) {
-    for (let balloon of this.balloons) {
-        if (balloon.pierced) {
-            ctx.drawImage(balloon_image, balloon_frame_width, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
-        } else {
-            ctx.drawImage(balloon_image, 0, 0, balloon_frame_width, balloon_frame_height, balloon.x, balloon.y, balloon_frame_width, balloon_frame_height);
+        if (this.violets.length == 0) {
+            onlevelend(true);
         }
-    }
-}
-
-Level2.prototype.update = function(arrows) {
-    this.balloons = this.balloons.filter(balloon => {
-        for (let arrow of arrows) {
-            let y_dist = arrow.y - balloon.y,
-                x_dist = arrow.x - balloon.x;
-            if (!balloon.pierced &&
-                y_dist > -arrow_height && y_dist < balloon_frame_height - 15 &&
-                x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
-            {
-                play(burst_sound);
-                balloon.pierced = true;
-                break;
-            }
-        }
-        if (balloon.pierced) {
-            balloon.y += 4;
-        } else {
-            balloon.y -= balloon.speed;
-            if (balloon.y < -balloon_frame_height) {
-                balloon.y += canvas_height + balloon_frame_height;
-            }
-        }
-        return !(balloon.pierced && balloon.y > (canvas_height + balloon_frame_height));
-    });
-    if (this.balloons.length == 0) {
-        onlevelend(true);
-    }
-}
-
-
-
-
-function Level3(onlevelend) {
-    this.bg_image = sky_image;
-    this.arrows_limit = 30;
-    this.onlevelend = onlevelend;
-    this.violets = [];
-    this.violets.push({
-        x: canvas_width - violet_width - 20,
-        y: (Math.random() * (canvas_height - violet_height - 30) + 30) | 0,
-        health: 10
-    });
-}
-
-Level3.prototype.drawOn = function(ctx) {
-    for (let violet of this.violets) {
-        ctx.fillStyle = '#87238f';
-        let pos_y = violet.y - 12;
-        for (let pos_x = violet.x + 10, health_drawn = 0; health_drawn < violet.health; ++health_drawn, pos_x += 6) {
-            ctx.fillRect(pos_x, pos_y, 6, 3);
-        }
-        ctx.drawImage(violet_image, violet_pos_x, violet_pos_y, violet_width, violet_height, violet.x, violet.y, violet_width, violet_height);
-    }
-}
-
-Level3.prototype.update = function(arrows) {
-    this.violets = this.violets.filter(violet => {
-        for (let arrow of arrows) {
-            let diff_y = (arrow.y + 2) - violet.y,
-                diff_x = (arrow.x + arrow_width) - violet.x;
-            if ((diff_y >= -2 && diff_y <= 1 && diff_x >= 34 && diff_x <= 36) ||
-                (diff_y >= 2 && diff_y <= 3 && diff_x >= 28 && diff_x <= 30) ||
-                (diff_y >= 4 && diff_y <= 5 && diff_x >= 26 && diff_x <= 28) ||
-                (diff_y >= 6 && diff_y <= 11 && diff_x >= 22 && diff_x <= 24) ||
-                (diff_y >= 12 && diff_y <= 13 && diff_x >= 8 && diff_x <= 10) ||
-                (diff_y >= 14 && diff_y <= 15 && diff_x >= 2 && diff_x <= 4) ||
-                (diff_y >= 16 && diff_y <= 29 && diff_x >= 0 && diff_x <= 2) ||
-                (diff_y >= 30 && diff_y <= 31 && diff_x >= 2 && diff_x <= 4) ||
-                (diff_y >= 32 && diff_y <= 33 && diff_x >= 4 && diff_x <= 6) ||
-                (diff_y >= 34 && diff_y <= 37 && diff_x >= 8 && diff_x <= 10) ||
-                (diff_y >= 38 && diff_y <= 51 && diff_x >= 6 && diff_x <= 8) ||
-                (diff_y >= 52 && diff_y <= 55 && diff_x >= 8 && diff_x <= 10) ||
-                (diff_y >= 56 && diff_y <= 57 && diff_x >= 10 && diff_x <= 12) ||
-                (diff_y >= 58 && diff_y <= 59 && diff_x >= 14 && diff_x <= 16) ||
-                (diff_y >= 60 && diff_y <= 61 && diff_x >= 44 && diff_x <= 46) ||
-                (diff_y >= 62 && diff_y <= 65 && diff_x >= 46 && diff_x <= 48))
-            {
-                play(air_hit_sound);
-                --violet.health;
-                break;
-            }
-        }
-        return !(violet.to_be_removed && violet.x > canvas_width);
-    });
-    if (this.violets.length == 0) {
-        onlevelend(true);
     }
 }
 
@@ -515,7 +489,7 @@ function draw() {
     for (let arrow of arrows) {
         ctx.drawImage(arrow_image, arrow.x, arrow.y);
     }
-    level.drawOn(ctx);
+    level.draw_on(ctx);
     status_font.draw(ctx, 5, 20, 'score');
     status_font.draw(ctx, 35, 20, '000000');
     status_font.draw(ctx, canvas_width - 35, 20, 'arrows');

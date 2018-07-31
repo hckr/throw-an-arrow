@@ -28,8 +28,13 @@ c.addEventListener('contextmenu', e => {
 let debug = false;
 
 document.addEventListener('keydown', e => {
-    if (e.key == 'd') {
+    switch(e.key) {
+    case 'd':
         debug = !debug;
+        break;
+    case 'n':
+        onlevelend(true);
+        break;
     }
 });
 

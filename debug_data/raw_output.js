@@ -334,7 +334,7 @@ class Level3 {
         let inactive = [];
         for (let i = 0; i < 4; ++i) {
             this.violets.push({
-                x: canvas_width - 100,
+                x: canvas_width,
                 y: 45 + i * 93,
                 health: 10,
                 state: VioletState.INACTIVE
@@ -395,7 +395,7 @@ class Level3 {
                     }
                 }
             }
-            switch(violet.state) {
+            switch (violet.state) {
             case VioletState.HIDDEN:
                 violet.state = VioletState.OTHER;
                 setTimeout(_ => {

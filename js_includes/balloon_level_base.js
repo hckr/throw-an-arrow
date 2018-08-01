@@ -30,6 +30,7 @@ class BalloonLevelBase {
                     x_dist + arrow_width > -3 && x_dist + arrow_width < 3)
                 {
                     play(burst_sound);
+                    add_score(10);
                     balloon.pierced = true;
                     break;
                 }

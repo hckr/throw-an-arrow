@@ -11,7 +11,7 @@ class Bubbles1 {
         let odd = true;
         for (let x = 0; x < 240; x += 24) {
             this.bubbles.push({
-                x: canvas_width - 20 - x,
+                x: canvas_width - 30 - x,
                 y: odd ? 0 : canvas_height - bubble_frame_height,
                 speed: -2,
                 frame: 0
@@ -37,14 +37,15 @@ class Bubbles1 {
                 let diff_y = (arrow.y + 2) - bubble.y,
                     diff_x = (arrow.x + arrow_width) - bubble.x;
                 if (!bubble.pierced &&
-                    (diff_y >= 0 && diff_y <= 7 && diff_x >= 4 && diff_x <= 6) ||
-                    (diff_y >= 8 && diff_y <= 11 && diff_x >= 2 && diff_x <= 4) ||
-                    (diff_y >= 12 && diff_y <= 23 && diff_x >= 0 && diff_x <= 2) ||
-                    (diff_y >= 24 && diff_y <= 27 && diff_x >= 2 && diff_x <= 4) ||
-                    (diff_y >= 28 && diff_y <= 31 && diff_x >= 4 && diff_x <= 6) ||
-                    (diff_y >= 32 && diff_y <= 42 && diff_x >= 6 && diff_x <= 8))
+                    (diff_y >= 0 && diff_y <= 7 && diff_x >= 4 && diff_x <= 7) ||
+                    (diff_y >= 8 && diff_y <= 11 && diff_x >= 2 && diff_x <= 5) ||
+                    (diff_y >= 12 && diff_y <= 23 && diff_x >= 0 && diff_x <= 3) ||
+                    (diff_y >= 24 && diff_y <= 27 && diff_x >= 2 && diff_x <= 5) ||
+                    (diff_y >= 28 && diff_y <= 31 && diff_x >= 4 && diff_x <= 7) ||
+                    (diff_y >= 32 && diff_y <= 42 && diff_x >= 6 && diff_x <= 9))
                 {
                     play(air_hit_sound);
+                    add_score(10);
                     bubble.pierced = true;
                     this.butterflies.push({
                         x: bubble.x - 1,

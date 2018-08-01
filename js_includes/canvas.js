@@ -33,6 +33,7 @@ document.addEventListener('keydown', e => {
         debug = !debug;
         break;
     case 'n':
+        arrows_remaining = 0;
         onlevelend(true);
         break;
     }

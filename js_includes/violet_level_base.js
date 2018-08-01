@@ -81,6 +81,7 @@ class VioletLevelBase {
                         (diff_y >= 62 && diff_y <= 65 && diff_x >= 46 && diff_x <= 49))
                     {
                         play(air_hit_sound);
+                        add_score(10);
                         --violet.health;
                         violet.state = VioletState.HIDING;
                         this.release_violet();

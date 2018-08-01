@@ -7,7 +7,7 @@ c.addEventListener('mousedown', e => {
         mouse_down = true;
         break;
     case 3:
-        if (arrows_remaining) {
+        if (arrows_remaining && !level_change) {
             if (bow.load_arrow()) { // returns false if cannot load
                 --arrows_remaining;
             }

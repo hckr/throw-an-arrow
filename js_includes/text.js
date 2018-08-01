@@ -24,5 +24,10 @@ TextDrawer.prototype.draw = function(ctx, x, y, text) {
 
 let status_font_image = new Image();
 status_font_image.src = '#colorizedfontdatauri{e1d1ac,assets/fonts/kenney_mini_regular_12.png}';
-let layout = {/* ghltojsobj{assets/fonts/kenney_mini_regular_12.xml} */};
-let status_font = new TextDrawer(status_font_image, layout, 20);
+let status_font_layout = {/* ghltojsobj{assets/fonts/kenney_mini_regular_12.xml} */};
+let status_font = new TextDrawer(status_font_image, status_font_layout, 20);
+
+let status_number_font_image = new Image();
+status_number_font_image.src = '#colorizedfontdatauri{e1d1ac,assets/fonts/kenney_rocket_square_regular_12.png}';
+let status_number_font_layout = {/* ghltojsobj{assets/fonts/kenney_rocket_square_regular_12.xml} */};
+let status_number_font = new TextDrawer(status_number_font_image, status_number_font_layout, 20);

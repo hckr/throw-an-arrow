@@ -1,19 +1,19 @@
-// include_once{level1.js}
-// include_once{level2.js}
-// include_once{level3.js}
-// include_once{level4.js}
+// include_once{balloons1.js}
+// include_once{ballons2.js}
+// include_once{violet1.js}
+// include_once{violet2.js}
 
 let levels_count = 4;
 
 function construct_level(n, onlevelend) {
     switch (n) {
     case 1:
-        return new Level1(onlevelend);
+        return new Balloons1(onlevelend);
     case 2:
-        return new Level2(onlevelend);
+        return new Balloons2(onlevelend);
     case 3:
-        return new Level3(onlevelend);
+        return new Violet1(onlevelend);
     case 4:
-        return new Level4(onlevelend);
+        return new Violet2(onlevelend);
     }
 }

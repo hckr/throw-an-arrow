@@ -1,6 +1,6 @@
 // include_once{violet_level_base.js}
 
-class Level4 extends VioletLevelBase {
+class Violet2 extends VioletLevelBase {
     constructor(onlevelend) {
         super(onlevelend, 45);
         this.minions = [];

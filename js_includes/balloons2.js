@@ -1,6 +1,6 @@
 // include_once{balloon_level_base.js}
 
-class Level2 extends BalloonLevelBase {
+class Balloons2 extends BalloonLevelBase {
     constructor(onlevelend) {
         let balloons = [],
             faster = true;

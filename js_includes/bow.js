@@ -8,11 +8,12 @@ let BowState = Object.freeze({
     OTHER: 4
 });
 
-function Bow(pos_y) {
+function Bow(pos_y, arrow_speed) {
     this.frame = 0;
     this.state = BowState.UNLOADED;
-    this.pos_y = pos_y,
-    this.pos_y_min = 0,
+    this.pos_y = pos_y;
+    this.arrow_speed = arrow_speed;
+    this.pos_y_min = 0;
     this.pos_y_max = canvas_height - bow_frame_height;
     this.strain_promise = null;
 }
@@ -54,7 +55,8 @@ Bow.prototype.release_arrow = function(add_arrow) {
         this.frame = 23;
         add_arrow({
             x: 0,
-            y: this.pos_y + 20
+            y: this.pos_y + 20,
+            speed: this.arrow_speed
         });
         let that = this;
         play(shoot_sound);

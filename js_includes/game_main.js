@@ -5,7 +5,7 @@
 // include_once{text.js}
 // include_once{sounds.js}
 
-let bow = new Bow(80),
+let bow = new Bow(80, 3),
     arrows_remaining = 0,
     arrows = [],
     level_n,
@@ -63,8 +63,8 @@ function draw() {
 function update() {
     level.update(arrows);
     arrows = arrows.filter(arrow => {
-        arrow.x += 3;
-        return arrow.x < canvas_width;
+        arrow.x += arrow.speed;
+        return arrow.x < canvas_width && arrow.x > -arrow_width;
     });
     setTimeout(update, 20);
 }

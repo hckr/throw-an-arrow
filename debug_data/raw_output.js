@@ -111,11 +111,12 @@ let BowState = Object.freeze({
     OTHER: 4
 });
 
-function Bow(pos_y) {
+function Bow(pos_y, arrow_speed) {
     this.frame = 0;
     this.state = BowState.UNLOADED;
-    this.pos_y = pos_y,
-    this.pos_y_min = 0,
+    this.pos_y = pos_y;
+    this.arrow_speed = arrow_speed;
+    this.pos_y_min = 0;
     this.pos_y_max = canvas_height - bow_frame_height;
     this.strain_promise = null;
 }
@@ -157,7 +158,8 @@ Bow.prototype.release_arrow = function(add_arrow) {
         this.frame = 23;
         add_arrow({
             x: 0,
-            y: this.pos_y + 20
+            y: this.pos_y + 20,
+            speed: this.arrow_speed
         });
         let that = this;
         play(shoot_sound);
@@ -325,10 +327,10 @@ let VioletState = Object.freeze({
     OTHER: 5
 });
 
-class Level3 {
-    constructor(onlevelend) {
+class VioletLevelBase {
+    constructor(onlevelend, arrows_limit) {
         this.bg_image = sky_image;
-        this.arrows_limit = 50;
+        this.arrows_limit = arrows_limit;
         this.onlevelend = onlevelend;
         this.violets = [];
         let inactive = [];
@@ -343,6 +345,7 @@ class Level3 {
         }
         this.inactive = inactive.sort((a, b) => a[1] < b[1]).map(a => a[0]);
         this.release_violet();
+        this.game_over = false;
     }
 
     release_violet() {
@@ -359,12 +362,20 @@ class Level3 {
             for (let pos_x = violet.x + 10, health_drawn = 0; health_drawn < violet.health; ++health_drawn, pos_x += 6) {
                 ctx.fillRect(pos_x, pos_y, 5, 2);
             }
-            ctx.drawImage(violet_image, violet_pos_x, violet_pos_y, violet_width, violet_height, violet.x, violet.y, violet_width, violet_height);
+            ctx.drawImage(violet_image, violet_pos_x, violet_pos_y, violet_width,
+                          violet_height, violet.x, violet.y, violet_width, violet_height);
         }
     }
 
-    update(arrows, bow) {
-        let game_over = false;
+    check_if_level_end() {
+        if (this.violets.length == 0) {
+            onlevelend(true);
+        } else if (this.game_over) {
+            onlevelend(false)
+        }
+    }
+
+    update(arrows) {
         this.violets = this.violets.filter(violet => {
             if (violet.state == VioletState.SHOWING) {
                 for (let arrow of arrows) {
@@ -413,21 +424,82 @@ class Level3 {
                 }
                 break;
             }
-            if (violet.x <= -violet_width) {
-                game_over = true;
+            if (violet.x <= -violet_width / 2) {
+                this.game_over = true;
             }
             return !(violet.health <= 0 && violet.state == VioletState.HIDDEN);
         });
-        if (this.violets.length == 0) {
-            onlevelend(true);
-        } else if (game_over) {
-            onlevelend(false)
-        }
+        this.check_if_level_end();
     }
 }
 
 
-let levels_count = 3;
+class Level3 extends VioletLevelBase {
+    constructor(onlevelend) {
+        super(onlevelend, 45);
+    }
+}
+
+
+
+class Level4 extends VioletLevelBase {
+    constructor(onlevelend) {
+        super(onlevelend, 45);
+        this.minions = [];
+        setTimeout(_ => this.release_minion(true), 1500);
+    }
+
+    release_minion(timeout) {
+        let ready_violets = this.violets.filter(violet => violet.state == VioletState.SHOWING && violet.x > 100);
+        if (ready_violets.length == 0) {
+            setTimeout(_ => this.release_minion(timeout), 100);
+            return;
+        }
+        let violet = ready_violets[(Math.random() * ready_violets.length) | 0];
+        this.minions.push({
+            x: violet.x + 20,
+            y: violet.y + Math.random() * 52,
+            frame: 0
+        });
+        if (timeout) {
+            setTimeout(_ => this.release_minion(true), 4000);
+        }
+    }
+
+    draw_on(ctx) {
+        for (let minion of this.minions) {
+            ctx.drawImage(violet_image, violet_minion_pos_x, violet_minion_pos_y,
+                          violet_minion_width, violet_minion_height, minion.x, minion.y,
+                          violet_minion_width, violet_minion_height);
+        }
+        super.draw_on(ctx);
+    }
+
+    update(arrows) {
+        this.minions = this.minions.filter(minion => {
+            minion.x -= 1.5;
+            let bow_diff_y = minion.y - bow.pos_y;
+            if (minion.x < bow_frame_width / 2 && bow_diff_y < bow_frame_height && bow_diff_y > -violet_minion_height) {
+                this.game_over = true;
+            }
+            for (let arrow of arrows) {
+                if (arrow.speed > 0) {
+                    let diff_y = arrow.y - minion.y,
+                        diff_x = (arrow.x + arrow_width) - minion.x;
+                    if (diff_y >= -2 && diff_y <= violet_minion_height + 2 && diff_x >= 0 && diff_x <= 4) {
+                        play(air_hit_sound);
+                        arrow.speed = -1.5;
+                    }
+                }
+            }
+            return minion.x > -violet_minion_width;
+        });
+        super.update(arrows);
+    }
+}
+
+
+let levels_count = 4;
 
 function construct_level(n, onlevelend) {
     switch (n) {
@@ -437,6 +509,8 @@ function construct_level(n, onlevelend) {
         return new Level2(onlevelend);
     case 3:
         return new Level3(onlevelend);
+    case 4:
+        return new Level4(onlevelend);
     }
 }
 
@@ -511,7 +585,7 @@ function play(sound, mute_background) {
 }
 
 
-let bow = new Bow(80),
+let bow = new Bow(80, 3),
     arrows_remaining = 0,
     arrows = [],
     level_n,
@@ -569,8 +643,8 @@ function draw() {
 function update() {
     level.update(arrows);
     arrows = arrows.filter(arrow => {
-        arrow.x += 3;
-        return arrow.x < canvas_width;
+        arrow.x += arrow.speed;
+        return arrow.x < canvas_width && arrow.x > -arrow_width;
     });
     setTimeout(update, 20);
 }

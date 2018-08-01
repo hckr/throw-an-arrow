@@ -29,6 +29,10 @@ let violet_pos_x = 0,
 
 let butterfly_image = new Image();
 butterfly_image.src = '#datauri{image/png,assets/images/butterfly.png}';
+let butterfly_frame_width = 16,
+    butterfly_frame_height = 32;
 
 let bubble_image = new Image();
 bubble_image.src = '#datauri{image/png,assets/images/bubble.png}';
+let bubble_frame_width = 22,
+    bubble_frame_height = 44;

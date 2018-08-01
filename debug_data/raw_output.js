@@ -226,10 +226,14 @@ let violet_pos_x = 0,
     violet_minion_height = 13;
 
 let butterfly_image = new Image();
-butterfly_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMoAAAAXAgMAAAA3qzjKAAAADFBMVEVlLWcaGhh5R//QwPXo0Py+AAAAAXRSTlMAQObYZgAAAhhJREFUeF6VkzFrGzEYhiUS1VNpDVFLBvdfdI4MTmcZ9OqQ4EYdyNAtGrq0fyJ3pgcZdeU89Dd46Z4hR35Jx9BK5xhTCMX+hnuHT89zeuGOEMIVOXVQ4gSAqvwoh/pogkk+ZGbw8WiGhwCRGNPUilBc4z/6vOPp8AzaqcSgc4EAZRD/AmfbXeQj4VqQXJt3vh8S4+IPzAvoWu6BN7v4SDggtluCEqjpABDufV8kt+9qvxw2xh8u95Dj6hF64+6/SVb29eUXmHUp2HePmNym06ul9aYP+xf9KYHx8g4twlAAn2c/XYyQr6PvvCRnl5X1ylTe4OG5Agna1oQhEbFA0LG9ff/btNoXZ65qErP95Zy+/dBWcaNShTwUuunUrEesi3lErvrqznlbqSdTmUqSq6Vr2/Wkq5oVikdwBcGiid7xUFd1oLYGFKFrNL29mRijW0nooFf29slY6+PXO5Rlqd41Gno9x9KkihxjOcBoq9gAj3tCA1CpiXZeR+Zg/QqzoL3pBZ2OX+KU0xQMQBQUuutHw6q/SYKuiaMUkeOTzXLKZWYuxo5cMUXGA2RnUElg/V3aQNK0YrEoyfPQaY5zhhzPX9gUAiILehDKJERaTUocfqrpjlzKxNNxTQTkKKBQafOWqOyGJIfZMYKnWCg1avjFQZCYFydvqEyMZGLsmGIvoC8yh835gqhdx73giFnsO7K94MRZHA/8BWnkwiacMIF6AAAAAElFTkSuQmCC';
+butterfly_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAAAgAgMAAACnTJi2AAAADFBMVEVlLWccGxp6SP/Sw/Hr/zJIAAAAAXRSTlMAQObYZgAAAW1JREFUeF7VzTGO1DAYBeD3EzxTAUJacwTOYYrtfyT/QS7okkhZgZRicg8XcaRsPSM0gkNwhDRZaQ9AwS34bYlFoGVqeMWzLH96xj8RYlyO9RfAlZZcAHzQqpu/A5Fc6bFvPMDAJg6oPzmS7QFUub6aA0GA9rOC7qOC9tfjKpwnzVs9w5mB1zNX/eKKWIEX481UrbU32ztGPyt4dRtpyTI/ekBSs5etMefF49spAne3TGk5lHnpQdJOz8ZT3G/dBNsq2Gl918uawcImpWEngZ+E+VjdB0Z1FyLadtqPnmme2Wyn1SQBjf0HhDkCco7V/XJ8LuIpyUTy3pF4QOoGYxiAsY6Q0FDqT5V0R1gB7LXTM8J2EbA3A8augUggaT3IK4CiNw5GHLQYNnyB9VegNCDHOIBYkfsp6wkvrwEauQBSYH1BpRR51co9HmJNQVqcUZn9LUaXM4J9WiToD0Auo1Jl7tGQK+WKvBiV/3V+AG1kbadEN+fpAAAAAElFTkSuQmCC';
+let butterfly_frame_width = 16,
+    butterfly_frame_height = 32;
 
 let bubble_image = new Image();
-bubble_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAAALAgMAAAAW8tsxAAAACVBMVEUAAGeHnOyKoOSjWo+EAAAAAXRSTlMAQObYZgAAAHxJREFUeF5VzjGqAjEUQNHzhkQsH4JTB0FwGal+PYUKdjbCLCNL/52Y01+4ENvyl1GUAFoRWF7WR4wMxkiDogvUa3c/1qVlMWvnU7/vhwCoOmCz0szA5kyC4dS9029zE83RrLl0u0CG340anRhZdBi+lqf140AyzMSmkGb/7+8OA9OhxZ0AAAAASUVORK5CYII=';
+bubble_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAAAsBAMAAADMatqKAAAAD1BMVEUAAADOv/WmmcS0nvnQwPXMCbvtAAAAAXRSTlMAQObYZgAAAPdJREFUeF7t1uGpwzAMBGDhDW4Dc8oE0gbZf6hHgh9ya0qaGkEpPowjCLnvhwmJPAVAux6rzedqY9uGDLdjuGcsA4jm/xnR1j8Uyogh9gljGcCpBNhK2tAV384y7gciPAi00pPsjMvg+rRAbunGtjHdID3ZAFTpJAGEK1MZDaqZcU81TE1tZ6rhak56qqFqRnvHQAxAf+K4NGimyUah0chUo9JUXVMNkub2aPRt8y8NsPOIpRok6e6pRuGZRENQSUrhwzm+KEa/33AhhawiqUatrMw3pDDVEKDW6B8/PBixIL/KEPkFY/ynDibKJt/EZXzsTRYvYyZ/Vbw36bu0YA0AAAAASUVORK5CYII=';
+let bubble_frame_width = 22,
+    bubble_frame_height = 44;
 
 
 
@@ -313,6 +317,85 @@ class Balloons2 extends BalloonLevelBase {
             faster = !faster;
         }
         super(onlevelend, 25, balloons);
+    }
+}
+
+
+
+
+class Bubbles1 {
+    constructor(onlevelend) {
+        this.arrows_limit = 12;
+        this.bubbles = [];
+        this.butterflies = [];
+        this.onlevelend = onlevelend;
+
+        let odd = true;
+        for (let x = 0; x < 240; x += 24) {
+            this.bubbles.push({
+                x: canvas_width - 20 - x,
+                y: odd ? 0 : canvas_height - bubble_frame_height,
+                speed: -2,
+                frame: 0
+            });
+            odd = !odd;
+        }
+
+        this.bg_image = sky_image;
+    }
+
+    draw_on(ctx) {
+        for (let bubble of this.bubbles) {
+            ctx.drawImage(bubble_image, bubble_frame_width * bubble.frame, 0, bubble_frame_width, bubble_frame_height, bubble.x, bubble.y, bubble_frame_width, bubble_frame_height);
+        }
+        for (let butterfly of this.butterflies) {
+            ctx.drawImage(butterfly_image, butterfly_frame_width * butterfly.frame, 0, butterfly_frame_width, butterfly_frame_height, butterfly.x, butterfly.y, butterfly_frame_width, butterfly_frame_height);
+        }
+    }
+
+    update(arrows) {
+        this.bubbles = this.bubbles.filter(bubble => {
+            for (let arrow of arrows) {
+                let diff_y = (arrow.y + 2) - bubble.y,
+                    diff_x = (arrow.x + arrow_width) - bubble.x;
+                if (!bubble.pierced &&
+                    (diff_y >= 0 && diff_y <= 7 && diff_x >= 4 && diff_x <= 6) ||
+                    (diff_y >= 8 && diff_y <= 11 && diff_x >= 2 && diff_x <= 4) ||
+                    (diff_y >= 12 && diff_y <= 23 && diff_x >= 0 && diff_x <= 2) ||
+                    (diff_y >= 24 && diff_y <= 27 && diff_x >= 2 && diff_x <= 4) ||
+                    (diff_y >= 28 && diff_y <= 31 && diff_x >= 4 && diff_x <= 6) ||
+                    (diff_y >= 32 && diff_y <= 42 && diff_x >= 6 && diff_x <= 8))
+                {
+                    play(air_hit_sound);
+                    bubble.pierced = true;
+                    this.butterflies.push({
+                        x: bubble.x - 1,
+                        y: bubble.y + 12,
+                        frame: 0
+                    });
+                    break;
+                }
+            }
+            if (bubble.pierced) {
+                ++bubble.frame;
+            } else {
+                bubble.y -= bubble.speed;
+                if (bubble.y <= -4 || bubble.y > canvas_height - bubble_frame_height + 4)
+                {
+                    bubble.speed = -bubble.speed;
+                }
+            }
+            return !(bubble.pierced && bubble.frame >= 9);
+        });
+        this.butterflies = this.butterflies.filter(butterfly => {
+            butterfly.x -= 1;
+            butterfly.y -= 1;
+            butterfly.frame = (butterfly.frame + 1) % 8;
+            return butterfly.y > -butterfly_frame_height;
+        });
+        if (this.bubbles.length == 0 && this.butterflies.length == 0) {
+            onlevelend(true);
+        }
     }
 }
 
@@ -499,7 +582,7 @@ class Violet2 extends VioletLevelBase {
 }
 
 
-let levels_count = 4;
+let levels_count = 5;
 
 function construct_level(n, onlevelend) {
     switch (n) {
@@ -508,8 +591,10 @@ function construct_level(n, onlevelend) {
     case 2:
         return new Balloons2(onlevelend);
     case 3:
-        return new Violet1(onlevelend);
+        return new Bubbles1(onlevelend);
     case 4:
+        return new Violet1(onlevelend);
+    case 5:
         return new Violet2(onlevelend);
     }
 }

@@ -284,7 +284,7 @@ class BalloonLevelBase {
 }
 
 
-class Level1 extends BalloonLevelBase {
+class Balloons1 extends BalloonLevelBase {
     constructor(onlevelend) {
         let balloons = [];
         for (let x = 0; x < 200; x += 12) {
@@ -300,7 +300,7 @@ class Level1 extends BalloonLevelBase {
 
 
 
-class Level2 extends BalloonLevelBase {
+class Balloons2 extends BalloonLevelBase {
     constructor(onlevelend) {
         let balloons = [],
             faster = true;
@@ -434,7 +434,7 @@ class VioletLevelBase {
 }
 
 
-class Level3 extends VioletLevelBase {
+class Violet1 extends VioletLevelBase {
     constructor(onlevelend) {
         super(onlevelend, 45);
     }
@@ -442,22 +442,22 @@ class Level3 extends VioletLevelBase {
 
 
 
-class Level4 extends VioletLevelBase {
+class Violet2 extends VioletLevelBase {
     constructor(onlevelend) {
-        super(onlevelend, 45);
+        super(onlevelend, 55);
         this.minions = [];
         setTimeout(_ => this.release_minion(true), 1500);
     }
 
     release_minion(timeout) {
-        let ready_violets = this.violets.filter(violet => violet.state == VioletState.SHOWING && violet.x > 100);
+        let ready_violets = this.violets.filter(violet => violet.state == VioletState.SHOWING && violet.x > 200);
         if (ready_violets.length == 0) {
             setTimeout(_ => this.release_minion(timeout), 100);
             return;
         }
         let violet = ready_violets[(Math.random() * ready_violets.length) | 0];
         this.minions.push({
-            x: violet.x + 20,
+            x: violet.x + 40,
             y: violet.y + Math.random() * 52,
             frame: 0
         });
@@ -486,7 +486,7 @@ class Level4 extends VioletLevelBase {
                 if (arrow.speed > 0) {
                     let diff_y = arrow.y - minion.y,
                         diff_x = (arrow.x + arrow_width) - minion.x;
-                    if (diff_y >= -2 && diff_y <= violet_minion_height + 2 && diff_x >= 0 && diff_x <= 4) {
+                    if (diff_y >= 0 && diff_y <= violet_minion_height - 2 && diff_x >= 2 && diff_x <= 6) {
                         play(air_hit_sound);
                         arrow.speed = -1.5;
                     }
@@ -504,13 +504,13 @@ let levels_count = 4;
 function construct_level(n, onlevelend) {
     switch (n) {
     case 1:
-        return new Level1(onlevelend);
+        return new Balloons1(onlevelend);
     case 2:
-        return new Level2(onlevelend);
+        return new Balloons2(onlevelend);
     case 3:
-        return new Level3(onlevelend);
+        return new Violet1(onlevelend);
     case 4:
-        return new Level4(onlevelend);
+        return new Violet2(onlevelend);
     }
 }
 

@@ -2,20 +2,20 @@
 
 class Violet2 extends VioletLevelBase {
     constructor(onlevelend) {
-        super(onlevelend, 45);
+        super(onlevelend, 55);
         this.minions = [];
         setTimeout(_ => this.release_minion(true), 1500);
     }
 
     release_minion(timeout) {
-        let ready_violets = this.violets.filter(violet => violet.state == VioletState.SHOWING && violet.x > 100);
+        let ready_violets = this.violets.filter(violet => violet.state == VioletState.SHOWING && violet.x > 200);
         if (ready_violets.length == 0) {
             setTimeout(_ => this.release_minion(timeout), 100);
             return;
         }
         let violet = ready_violets[(Math.random() * ready_violets.length) | 0];
         this.minions.push({
-            x: violet.x + 20,
+            x: violet.x + 40,
             y: violet.y + Math.random() * 52,
             frame: 0
         });
@@ -44,7 +44,7 @@ class Violet2 extends VioletLevelBase {
                 if (arrow.speed > 0) {
                     let diff_y = arrow.y - minion.y,
                         diff_x = (arrow.x + arrow_width) - minion.x;
-                    if (diff_y >= -2 && diff_y <= violet_minion_height + 2 && diff_x >= 0 && diff_x <= 4) {
+                    if (diff_y >= 0 && diff_y <= violet_minion_height - 2 && diff_x >= 2 && diff_x <= 6) {
                         play(air_hit_sound);
                         arrow.speed = -1.5;
                     }

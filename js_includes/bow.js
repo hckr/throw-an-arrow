@@ -83,7 +83,7 @@ Bow.prototype.move_y = function(diff) {
     }
 }
 
-Bow.prototype.drawOn = function(ctx) {
+Bow.prototype.draw_on = function(ctx) {
     ctx.drawImage(bow_image, (this.frame % 6) * bow_frame_width, ((this.frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
                   0, this.pos_y, bow_frame_width, bow_frame_height);
 

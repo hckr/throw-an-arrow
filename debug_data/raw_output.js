@@ -25,54 +25,63 @@ c.addEventListener('contextmenu', e => {
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // debug code below (plus in draw function!)
 
-let debug = false;
-
-document.addEventListener('keydown', e => {
-    switch(e.key) {
-    case 'd':
-        debug = !debug;
-        break;
-    case 'n':
-        arrows_remaining = 0;
-        onlevelend(true);
-        break;
-    }
-});
-
-// let hex_colors = {};
+// let debug = false;
 //
-// function to_hex_color(r, g, b) {
-//     let key = [r,g,b].toString(),
-//         ans = hex_colors[key];
-//     if (ans) {
-//         return ans;
-//     }
-//     for (let arg of arguments) {
-//         let str = arg.toString(16);
-//         if (str.length == 1) {
-//             ans += '0';
+// document.addEventListener('keydown', e => {
+//     switch(e.key) {
+//     case 'd':
+//         debug = !debug;
+//         break;
+//     case 'n':
+//         arrows_remaining = 0;
+//         onlevelend(true);
+//         break;
+//     case 'q':
+//         if (level_n == 3) {
+//             level.butterflies.push({
+//                 x: canvas_width - 30 - 1,
+//                 y: canvas_height - bubble_frame_height + 12,
+//                 frame: 0
+//             });
 //         }
-//         ans += str;
+//         break;
 //     }
-//     hex_colors[key] = ans;
-//     return ans;
+// });
+//
+// // let hex_colors = {};
+// //
+// // function to_hex_color(r, g, b) {
+// //     let key = [r,g,b].toString(),
+// //         ans = hex_colors[key];
+// //     if (ans) {
+// //         return ans;
+// //     }
+// //     for (let arg of arguments) {
+// //         let str = arg.toString(16);
+// //         if (str.length == 1) {
+// //             ans += '0';
+// //         }
+// //         ans += str;
+// //     }
+// //     hex_colors[key] = ans;
+// //     return ans;
+// // }
+//
+// function check_colors_and_get_count() {
+//     let data = ctx.getImageData(0, 0, canvas_width, canvas_height).data,
+//         colors = new Set();
+//     for (let i = 0; i < data.length; i += 4) {
+//         let r = data[i],
+//             g = data[i+1],
+//             b = data[i+2],
+//             a = data[i+3];
+//         if (a != 255) {
+//             throw 'Found a transparent pixel!';
+//         }
+//         colors.add([r, g, b].toString());
+//     }
+//     return colors.size;
 // }
-
-function check_colors_and_get_count() {
-    let data = ctx.getImageData(0, 0, canvas_width, canvas_height).data,
-        colors = new Set();
-    for (let i = 0; i < data.length; i += 4) {
-        let r = data[i],
-            g = data[i+1],
-            b = data[i+2],
-            a = data[i+3];
-        if (a != 255) {
-            throw 'Found a transparent pixel!';
-        }
-        colors.add([r, g, b].toString());
-    }
-    return colors.size;
-}
 
 let audioCtx = new AudioContext(),
     source = audioCtx.createBufferSource(),
@@ -186,7 +195,7 @@ Bow.prototype.move_y = function(diff) {
     }
 }
 
-Bow.prototype.drawOn = function(ctx) {
+Bow.prototype.draw_on = function(ctx) {
     ctx.drawImage(bow_image, (this.frame % 6) * bow_frame_width, ((this.frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
                   0, this.pos_y, bow_frame_width, bow_frame_height);
 
@@ -659,7 +668,7 @@ c.addEventListener('mouseup', e => {
 });
 
 c.addEventListener('mousemove', e => {
-    if (mouse_down) {
+    if (game_state == GameState.LEVEL_PLAY && mouse_down) {
         bow.move_y(e.movementY * canvas_height / canvas_real_height);
     }
 });
@@ -697,8 +706,6 @@ class TextDrawer {
         for (let char of uptext) {
             let layout = this.layout[char];
             if (layout) {
-                // let [cx, cy, cw, ch] = layout['rect'];
-                // let [ox, oy] = layout['offset'];
                 width += layout['advance'];
 
             } else if (char == '\n') {
@@ -751,8 +758,8 @@ let big_font_layout = {' ': {advance: 6, rect: [0, 31, 0, 0], offset: [0, 0]}, '
 let big_font = new TextDrawer(big_font_image, big_font_layout, 50);
 
 let normal_font_image = new Image();
-normal_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAAALCAYAAACZDKRCAAABQklEQVR42u1YS3LFMAhDnZy+52nPx1t00nH9bBCfzHRhreJfbDAIJfj6/Fb5AURkfB6xmjNi7r/bmNZba6xxLM7hnc3aezcOp515726+N8+zJ2pv1I+M/9/2+pCDg0ZcU4SCfNZFdK+ifZchqzUzIyqZGUym72wUwg7PLoYZpJD92bYs7uwJ/PHPYaiDRxgqG8HqaA015ltMs9MLK32jQb23s8FiISXYN7u/FN/n+aiDgTzt9Dt+NRhaddLY1sAlhgVjogxnShwa/COBoKjsx5RDdWSKzgyFJmPhXDbIYITDWp2XlcnS/wBWo0ZsQuHLFWNA3ZeFDb0yvxOYrLLKFQiqZT+RaXomg7ta4jQZuKyMsHzslS4YyaqZMntE+UG7KIcT1VZ/RQcwfQjMR1GDRMer52F8jeJ5OnyIyBkPQx204gWQZZkcNmwt+gAAAABJRU5ErkJggg==';
-let normal_font_layout = {' ': {advance: 2, rect: [0, 9, 0, 0], offset: [0, 0]}, '!': {advance: 2, rect: [0, 0, 1, 9], offset: [0, 9]}, '\'': {advance: 2, rect: [1, 0, 1, 4], offset: [0, 9]}, '(': {advance: 3, rect: [2, 0, 2, 9], offset: [0, 9]}, ')': {advance: 3, rect: [4, 0, 2, 9], offset: [0, 9]}, ',': {advance: 2, rect: [6, 7, 1, 4], offset: [0, 2]}, '.': {advance: 2, rect: [7, 7, 1, 2], offset: [0, 2]}, '0': {advance: 5, rect: [8, 0, 4, 9], offset: [0, 9]}, '1': {advance: 3, rect: [12, 0, 2, 9], offset: [0, 9]}, '2': {advance: 5, rect: [14, 0, 4, 9], offset: [0, 9]}, '3': {advance: 5, rect: [18, 0, 4, 9], offset: [0, 9]}, '4': {advance: 5, rect: [22, 0, 4, 9], offset: [0, 9]}, '5': {advance: 5, rect: [26, 0, 4, 9], offset: [0, 9]}, '6': {advance: 5, rect: [30, 0, 4, 9], offset: [0, 9]}, '7': {advance: 5, rect: [34, 0, 4, 9], offset: [0, 9]}, '8': {advance: 5, rect: [38, 0, 4, 9], offset: [0, 9]}, '9': {advance: 5, rect: [42, 0, 4, 9], offset: [0, 9]}, ':': {advance: 2, rect: [46, 2, 1, 5], offset: [0, 7]}, A: {advance: 5, rect: [47, 0, 4, 9], offset: [0, 9]}, B: {advance: 5, rect: [51, 0, 4, 9], offset: [0, 9]}, C: {advance: 5, rect: [55, 0, 4, 9], offset: [0, 9]}, D: {advance: 5, rect: [59, 0, 4, 9], offset: [0, 9]}, E: {advance: 5, rect: [63, 0, 4, 9], offset: [0, 9]}, F: {advance: 5, rect: [67, 0, 4, 9], offset: [0, 9]}, G: {advance: 5, rect: [71, 0, 4, 9], offset: [0, 9]}, H: {advance: 5, rect: [75, 0, 4, 9], offset: [0, 9]}, I: {advance: 2, rect: [79, 0, 1, 9], offset: [0, 9]}, J: {advance: 4, rect: [80, 0, 3, 9], offset: [0, 9]}, K: {advance: 5, rect: [83, 0, 4, 9], offset: [0, 9]}, L: {advance: 4, rect: [87, 0, 3, 9], offset: [0, 9]}, M: {advance: 6, rect: [90, 0, 5, 9], offset: [0, 9]}, N: {advance: 5, rect: [95, 0, 4, 9], offset: [0, 9]}, O: {advance: 5, rect: [99, 0, 4, 9], offset: [0, 9]}, P: {advance: 5, rect: [103, 0, 4, 9], offset: [0, 9]}, Q: {advance: 5, rect: [107, 0, 4, 9], offset: [0, 9]}, R: {advance: 5, rect: [111, 0, 4, 9], offset: [0, 9]}, S: {advance: 5, rect: [115, 0, 4, 9], offset: [0, 9]}, T: {advance: 4, rect: [119, 0, 3, 9], offset: [0, 9]}, U: {advance: 5, rect: [122, 0, 4, 9], offset: [0, 9]}, V: {advance: 6, rect: [126, 0, 5, 9], offset: [0, 9]}, W: {advance: 6, rect: [131, 0, 5, 9], offset: [0, 9]}, X: {advance: 5, rect: [136, 0, 4, 9], offset: [0, 9]}, Y: {advance: 5, rect: [140, 0, 4, 9], offset: [0, 9]}, Z: {advance: 5, rect: [144, 0, 4, 9], offset: [0, 9]}};
+normal_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJcAAAALCAYAAAByOx9BAAABT0lEQVR42u1YW47DMAhkKp9+z9Oej/50pdQ1MGB7tWrCV2zj8MxAwP3noSICiemXT1/r4/OR+n0c7gp5xzvv34NOR0sHcWSMzhGsK++1+CO+yJ6svVk/Mv7/kHWTiy7aRI3kUwOB+j0x1t6XM7rTy1byi2EQYCRTCZ0YuxjEkAlUqK6t6rOa3vzTDGdho9Az0s6A/rUddExbArUYPs+R6vB7CGT1F6N+SJM6sTpae5rwyQpifWz5aLUOblzbgQkLEqsEn8kE14Kcb0CNVb5nSnQVabXSc81AppKB7s+9xMagJ1uRTEyPhQmbdrcXSPa9leTpZZh9XjOCaME5gmaRdYhX0kCMIqIRQRrCyV/3TBnUSZSJxj6RPl5JHMURTlJqpRTfvqRsnP2H4d+OIrzhIBNILEgEJOVE/CgmYfV8Vh8Q+5jUZ4UPkdHxGqJetI2eV9GXI0ssAdwAAAAASUVORK5CYII=';
+let normal_font_layout = {' ': {advance: 2, rect: [0, 9, 0, 0], offset: [0, 0]}, '!': {advance: 2, rect: [0, 0, 1, 9], offset: [0, 9]}, ',': {advance: 2, rect: [1, 8, 1, 3], offset: [0, 1]}, '-': {advance: 4, rect: [2, 3, 3, 2], offset: [0, 6]}, '.': {advance: 2, rect: [5, 7, 1, 2], offset: [0, 2]}, '/': {advance: 6, rect: [6, 0, 5, 9], offset: [0, 9]}, '0': {advance: 5, rect: [11, 0, 4, 9], offset: [0, 9]}, '1': {advance: 3, rect: [15, 0, 2, 9], offset: [0, 9]}, '2': {advance: 5, rect: [17, 0, 4, 9], offset: [0, 9]}, '3': {advance: 5, rect: [21, 0, 4, 9], offset: [0, 9]}, '4': {advance: 5, rect: [25, 0, 4, 9], offset: [0, 9]}, '5': {advance: 5, rect: [29, 0, 4, 9], offset: [0, 9]}, '6': {advance: 5, rect: [33, 0, 4, 9], offset: [0, 9]}, '7': {advance: 5, rect: [37, 0, 4, 9], offset: [0, 9]}, '8': {advance: 5, rect: [41, 0, 4, 9], offset: [0, 9]}, '9': {advance: 5, rect: [45, 0, 4, 9], offset: [0, 9]}, ':': {advance: 2, rect: [49, 2, 1, 6], offset: [0, 7]}, A: {advance: 5, rect: [50, 0, 4, 9], offset: [0, 9]}, B: {advance: 5, rect: [54, 0, 4, 9], offset: [0, 9]}, C: {advance: 5, rect: [58, 0, 4, 9], offset: [0, 9]}, D: {advance: 5, rect: [62, 0, 4, 9], offset: [0, 9]}, E: {advance: 5, rect: [66, 0, 4, 9], offset: [0, 9]}, F: {advance: 5, rect: [70, 0, 4, 9], offset: [0, 9]}, G: {advance: 5, rect: [74, 0, 4, 9], offset: [0, 9]}, H: {advance: 5, rect: [78, 0, 4, 9], offset: [0, 9]}, I: {advance: 2, rect: [82, 0, 1, 9], offset: [0, 9]}, J: {advance: 4, rect: [83, 0, 3, 9], offset: [0, 9]}, K: {advance: 5, rect: [86, 0, 4, 9], offset: [0, 9]}, L: {advance: 4, rect: [90, 0, 3, 9], offset: [0, 9]}, M: {advance: 6, rect: [93, 0, 5, 9], offset: [0, 9]}, N: {advance: 5, rect: [98, 0, 4, 9], offset: [0, 9]}, O: {advance: 5, rect: [102, 0, 4, 9], offset: [0, 9]}, P: {advance: 5, rect: [106, 0, 4, 9], offset: [0, 9]}, Q: {advance: 5, rect: [110, 0, 4, 9], offset: [0, 9]}, R: {advance: 5, rect: [114, 0, 4, 9], offset: [0, 9]}, S: {advance: 5, rect: [118, 0, 4, 9], offset: [0, 9]}, T: {advance: 4, rect: [122, 0, 3, 9], offset: [0, 9]}, U: {advance: 5, rect: [125, 0, 4, 9], offset: [0, 9]}, V: {advance: 6, rect: [129, 0, 5, 9], offset: [0, 9]}, W: {advance: 6, rect: [134, 0, 5, 9], offset: [0, 9]}, X: {advance: 5, rect: [139, 0, 4, 9], offset: [0, 9]}, Y: {advance: 5, rect: [143, 0, 4, 9], offset: [0, 9]}, Z: {advance: 5, rect: [147, 0, 4, 9], offset: [0, 9]}};
 let normal_font = new TextDrawer(normal_font_image, normal_font_layout, 15);
 
 let shoot_sound = 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAABgvaosAAAAAEYs6BsBHgF2b3JiaXMAAAAAAXAXAAAAAAAA/////wAAAACZAU9nZ1MAAAAAAAAAAAAAYL2qLAEAAAB1/L/YC4z///////////+1A3ZvcmJpczUAAABYaXBoLk9yZyBsaWJWb3JiaXMgSSAyMDE4MDMxNiAoTm93IDEwMCUgZmV3ZXIgc2hlbGxzKQEAAABDAAAAQVJUSVNUPXF1Ym9kdXAgYWthIEl3YW4gR2Fib3ZpdGNoIHwgcXVib2R1cEBnbWFpbC5jb20gKG1vZCBieSBoY2tyKQEFdm9yYmlzEkJDVgEAAAEADFIUISUZU0pjCJVSUikFHWNQW0cdY9Q5RiFkEFOISRmle08qlVhKyBFSWClFHVNMU0mVUpYpRR1jFFNIIVPWMWWhcxRLhkkJJWxNrnQWS+iZY5YxRh1jzlpKnWPWMUUdY1JSSaFzGDpmJWQUOkbF6GJ8MDqVokIovsfeUukthYpbir3XGlPrLYQYS2nBCGFz7bXV3EpqxRhjjDHGxeJTKILQkFUAAAEAAEAEAUJDVgEACgAAwlAMRVGA0JBVAEAGAIAAFEVxFMdxHEeSJMsCQkNWAQBAAAACAAAojuEokiNJkmRZlmVZlqZ5lqi5qi/7ri7rru3qug6EhqwEAMgAABiGIYfeScyQU5BJJilVzDkIofUOOeUUZNJSxphijFHOkFMMMQUxhtAphRDUTjmlDCIIQ0idZM4gSz3o4GLnOBAasiIAiAIAAIxBjCHGkHMMSgYhco5JyCBEzjkpnZRMSiittJZJCS2V1iLnnJROSialtBZSy6SU1kIrBQAABDgAAARYCIWGrAgAogAAEIOQUkgpxJRiTjGHlFKOKceQUsw5xZhyjDHoIFTMMcgchEgpxRhzTjnmIGQMKuYchAwyAQAAAQ4AAAEWQqEhKwKAOAEAgyRpmqVpomhpmih6pqiqoiiqquV5pumZpqp6oqmqpqq6rqmqrmx5nml6pqiqnimqqqmqrmuqquuKqmrLpqvatumqtuzKsm67sqzbnqrKtqm6sm6qrm27smzrrizbuuR5quqZput6pum6quvasuq6su2ZpuuKqivbpuvKsuvKtq3Ksq5rpum6oqvarqm6su3Krm27sqz7puvqturKuq7Ksu7btq77sq0Lu+i6tq7Krq6rsqzrsi3rtmzbQsnzVNUzTdf1TNN1Vde1bdV1bVszTdc1XVeWRdV1ZdWVdV11ZVv3TNN1TVeVZdNVZVmVZd12ZVeXRde1bVWWfV11ZV+Xbd33ZVnXfdN1dVuVZdtXZVn3ZV33hVm3fd1TVVs3XVfXTdfVfVvXfWG2bd8XXVfXVdnWhVWWdd/WfWWYdZ0wuq6uq7bs66os676u68Yw67owrLpt/K6tC8Or68ax676u3L6Patu+8Oq2Mby6bhy7sBu/7fvGsamqbZuuq+umK+u6bOu+b+u6cYyuq+uqLPu66sq+b+u68Ou+Lwyj6+q6Ksu6sNqyr8u6Lgy7rhvDatvC7tq6cMyyLgy37yvHrwtD1baF4dV1o6vbxm8Lw9I3dr4AAIABBwCAABPKQKEhKwKAOAEABiEIFWMQKsYghBBSCiGkVDEGIWMOSsYclBBKSSGU0irGIGSOScgckxBKaKmU0EoopaVQSkuhlNZSai2m1FoMobQUSmmtlNJaaim21FJsFWMQMuekZI5JKKW0VkppKXNMSsagpA5CKqWk0kpJrWXOScmgo9I5SKmk0lJJqbVQSmuhlNZKSrGl0kptrcUaSmktpNJaSam11FJtrbVaI8YgZIxByZyTUkpJqZTSWuaclA46KpmDkkopqZWSUqyYk9JBKCWDjEpJpbWSSiuhlNZKSrGFUlprrdWYUks1lJJaSanFUEprrbUaUys1hVBSC6W0FkpprbVWa2ottlBCa6GkFksqMbUWY22txRhKaa2kElspqcUWW42ttVhTSzWWkmJsrdXYSi051lprSi3W0lKMrbWYW0y5xVhrDSW0FkpprZTSWkqtxdZaraGU1koqsZWSWmyt1dhajDWU0mIpKbWQSmyttVhbbDWmlmJssdVYUosxxlhzS7XVlFqLrbVYSys1xhhrbjXlUgAAwIADAECACWWg0JCVAEAUAABgDGOMQWgUcsw5KY1SzjknJXMOQggpZc5BCCGlzjkIpbTUOQehlJRCKSmlFFsoJaXWWiwAAKDAAQAgwAZNicUBCg1ZCQBEAQAgxijFGITGIKUYg9AYoxRjECqlGHMOQqUUY85ByBhzzkEpGWPOQSclhBBCKaWEEEIopZQCAAAKHAAAAmzQlFgcoNCQFQFAFAAAYAxiDDGGIHRSOikRhExKJ6WREloLKWWWSoolxsxaia3E2EgJrYXWMmslxtJiRq3EWGIqAADswAEA7MBCKDRkJQCQBwBAGKMUY845ZxBizDkIITQIMeYchBAqxpxzDkIIFWPOOQchhM455yCEEELnnHMQQgihgxBCCKWU0kEIIYRSSukghBBCKaV0EEIIoZRSCgAAKnAAAAiwUWRzgpGgQkNWAgB5AACAMUo5JyWlRinGIKQUW6MUYxBSaq1iDEJKrcVYMQYhpdZi7CCk1FqMtXYQUmotxlpDSq3FWGvOIaXWYqw119RajLXm3HtqLcZac865AADcBQcAsAMbRTYnGAkqNGQlAJAHAEAgpBRjjDmHlGKMMeecQ0oxxphzzinGGHPOOecUY4w555xzjDHnnHPOOcaYc84555xzzjnnoIOQOeecc9BB6JxzzjkIIXTOOecchBAKAAAqcAAACLBRZHOCkaBCQ1YCAOEAAIAxlFJKKaWUUkqoo5RSSimllFICIaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKZVSSimllFJKKaWUUkoppQAg3woHAP8HG2dYSTorHA0uNGQlABAOAAAYwxiEjDknJaWGMQildE5KSSU1jEEopXMSUkopg9BaaqWk0lJKGYSUYgshlZRaCqW0VmspqbWUUigpxRpLSqml1jLnJKSSWkuttpg5B6Wk1lpqrcUQQkqxtdZSa7F1UlJJrbXWWm0tpJRaay3G1mJsJaWWWmupxdZaTKm1FltLLcbWYkutxdhiizHGGgsA4G5wAIBIsHGGlaSzwtHgQkNWAgAhAQAEMko555yDEEIIIVKKMeeggxBCCCFESjHmnIMQQgghhIwx5yCEEEIIoZSQMeYchBBCCCGEUjrnIIRQSgmllFJK5xyEEEIIpZRSSgkhhBBCKKWUUkopIYQQSimllFJKKSWEEEIopZRSSimlhBBCKKWUUkoppZQQQiillFJKKaWUEkIIoZRSSimllFJCCKWUUkoppZRSSighhFJKKaWUUkoJJZRSSimllFJKKSGUUkoppZRSSimlAACAAwcAgAAj6CSjyiJsNOHCAxAAAAACAAJMAIEBgoJRCAKEEQgAAAAAAAgA+AAASAqAiIho5gwOEBIUFhgaHB4gIiQAAAAAAAAAAAAAAAAET2dnUwAEsgQAAAAAAABgvaosAgAAAF45DxMGRUZHOi41uhx6HRkzlgJj/Hpggr3+F2fJyRnpbGaXu4z+jY3UpNOaKwAZjZ6Ot/EEoBnZxECN0BjUKNvRvzHskdVlJCQ6RCHs0yYAwqGcr9MA2AxCRl7DrUaqZsYhp6mGhJWhYvvK1bfxiU0Eb+GyzvG8tnS/vgg9kO2TmdJZaYkX17Ys/lxJ873BctcuXfNkAbpd6NMUAJpAZSUnX0rWgNBk7zRWJk7W3LDl/Ss3yf4ZybC57NAKhsvrkeyPQ7z05Hp7XS+twbyZpCR+HzkjmYdGCx+0kM0Dsll5yVVCQmUl0DR29LAaLbE9sOPOgCM/tz9HDydphKEGwJ2RmUfiVp5WhLspmNT0r+9lEknU8dxcALKX5lRzDQIWkTK3yd6lcOXVOR4L7hyWy1cAfY9GrfwwDSCxfBa6lIdW7D76lw+ilNpyQwDkAhUfpyp4jPHgy6MK2Bdb0VYA47+eEQCAs/8832Rr4Na8XncOuGNRVOftQcveAw==',
@@ -766,7 +773,7 @@ function play(sound, mute_background) {
 }
 
 
-let bow = new Bow(80, 3),
+let bow = new Bow(-46, 3),
     arrows_remaining = 0,
     arrows = [],
     level_n,
@@ -779,23 +786,52 @@ let bow = new Bow(80, 3),
 localStorage['best_score'] = localStorage['best_score'] || 0;
 
 let GameState = Object.freeze({
-    LEVEL_INFO: 1,
-    LEVEL_PLAY: 2,
-    LEVEL_PASSED: 3,
-    LEVEL_FAILED: 4
+    TITLE_SCREEN: 1,
+    LEVEL_INFO: 2,
+    LEVEL_PLAY: 3,
+    LEVEL_PASSED: 4,
+    LEVEL_FAILED: 5,
+    END_SCREEN: 6
 });
-let game_state = GameState.LEVEL_INFO;
+let game_state = GameState.TITLE_SCREEN;
+
+let TitleScreenState = Object.freeze({
+    REVEALING_BOW: 1,
+    FIRING_ARROW_1: 2,
+    MOVING_BOW_1: 3,
+    FIRING_ARROW_2: 4,
+    MOVING_BOW_2: 5,
+    FIRING_ARROW_3: 6,
+    MOVING_BOW_3: 7,
+    AFTER_INTRO: 8,
+    BOW_TIMEOUT: 9
+});
+let title_screen_state = TitleScreenState.REVEALING_BOW,
+    title_screen_arrows = [];
 
 document.addEventListener('click', e => {
-    if (game_state == GameState.LEVEL_INFO && e.which == 1) {
-        game_state = GameState.LEVEL_PLAY;
+    if (e.which == 1) {
+        switch (game_state) {
+            case GameState.LEVEL_INFO:
+                game_state = GameState.LEVEL_PLAY;
+                break;
+            case GameState.TITLE_SCREEN:
+                if (title_screen_state != TitleScreenState.AFTER_INTRO) {
+                    break;
+                }
+                // no break
+            case GameState.END_SCREEN:
+                level_n = 1;
+                prepare_level();
+                break;
+        }
     }
 });
 
 function add_arrow(arrow) {
     arrows.push(arrow);
     if (!arrows_remaining) {
-        last_arrow_timeout = setTimeout(_ => onlevelend(false), 5500);
+        last_arrow_timeout = setTimeout(_ => onlevelend(false), 6000);
     }
 }
 
@@ -838,32 +874,115 @@ function onlevelend(success) {
         change_remaining_arrows_to_score(_ => {
             ++level_n;
             if (level_n > levels_count) {
-                level_n = 1;
+                game_state = GameState.END_SCREEN;
+            } else {
+                prepare_level();
             }
-            prepare_level();
         });
     } else {
-        if (success === false) {
-            play(lose_sound);
-            game_state = GameState.LEVEL_FAILED;
-            setTimeout(_ => {
-                level_n = 1;
-                score = 0;
-                prepare_level();
-            }, 5000);
-        } else {
+        play(lose_sound);
+        game_state = GameState.LEVEL_FAILED;
+        setTimeout(_ => {
             level_n = 1;
             score = 0;
             prepare_level();
-        }
+        }, 5000);
     }
 }
 
+let throw_canvas = document.createElement('canvas'),
+    an_canvas = document.createElement('canvas'),
+    arrow_canvas = document.createElement('canvas'),
+    throw_ctx = throw_canvas.getContext('2d'),
+    an_ctx = an_canvas.getContext('2d'),
+    arrow_ctx = arrow_canvas.getContext('2d');
+
+[throw_canvas.width, throw_canvas.height] = big_font.measure('Throw');
+[an_canvas.width, an_canvas.height] = big_font.measure('an');
+[arrow_canvas.width, arrow_canvas.height] = big_font.measure('arrow');
+
+big_font.draw(throw_ctx, 0, throw_canvas.height, 'Throw');
+big_font.draw(an_ctx, 0, an_canvas.height, 'an');
+big_font.draw(arrow_ctx, 0, arrow_canvas.height, 'arrow');
+
 function draw() {
     switch (game_state) {
+    case GameState.TITLE_SCREEN:
+        ctx.drawImage(sky_image, 0, 0, sky_image.width, sky_image.height, 0, 0, canvas_width, canvas_height);
+
+        let status_text = '';
+
+        if (title_screen_state == TitleScreenState.AFTER_INTRO) {
+            ctx.drawImage(throw_canvas, 60, 130);
+            ctx.drawImage(an_canvas, 150, 160);
+            ctx.drawImage(arrow_canvas, 200, 190);
+
+            status_text = 'Left click to play!';
+            normal_font.draw_bottom_centered(ctx, 'Please visit https://github.com/hckr/throw-an-arrow\nfor information about the authors of used resources and the code');
+        } else {
+
+            if (title_screen_arrows[0]) {
+                let pos_x = 60,
+                    width = (title_screen_arrows[0].x + arrow_width) - pos_x;
+                if (width > 0) {
+                    if (width > throw_canvas.width) {
+                        width = throw_canvas.width;
+                    }
+                    ctx.drawImage(throw_canvas, 0, 0, width, throw_canvas.height,
+                                                pos_x, 130, width, throw_canvas.height);
+                }
+            }
+
+            if (title_screen_arrows[1]) {
+                let pos_x = 150,
+                    width = (title_screen_arrows[1].x + arrow_width) - pos_x;
+                if (width > 0) {
+                    if (width > throw_canvas.width) {
+                        width = throw_canvas.width;
+                    }
+                    ctx.drawImage(an_canvas, 0, 0, width, throw_canvas.height,
+                                             pos_x, 160, width, throw_canvas.height);
+                }
+            }
+
+            if (title_screen_arrows[2]) {
+                let pos_x = 200,
+                    width = (title_screen_arrows[2].x + arrow_width) - pos_x;
+                if (width > 0) {
+                    if (width > throw_canvas.width) {
+                        width = throw_canvas.width;
+                    }
+                    ctx.drawImage(arrow_canvas, 0, 0, width, throw_canvas.height,
+                                                pos_x, 190, width, throw_canvas.height);
+                }
+            }
+
+            if (document.webkitFullscreenElement !== c) {
+                status_text = 'Left click to enter fullscreen!';
+            }
+        }
+        ctx.save();
+            if (blink_val < 50) {
+                ctx.globalAlpha = blink_val * 0.02;
+            } else if (blink_val < 75) {
+                // alpha == 1
+            } else {
+                ctx.globalAlpha = (125 - blink_val) * 0.02;
+            }
+            status_font.draw_centered(ctx, status_text, 20);
+        ctx.restore();
+
+        bow.draw_on(ctx);
+
+        for (let arrow of title_screen_arrows) {
+            ctx.drawImage(arrow_image, arrow.x, arrow.y);
+        }
+
+        break;
+
     case GameState.LEVEL_INFO:
         ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
-        bow.drawOn(ctx);
+        bow.draw_on(ctx);
         big_font.draw_centered(ctx, `Level ${level_n}\n${level.title}`);
         normal_font.draw_bottom_centered(ctx, level.description);
         ctx.save();
@@ -880,7 +999,7 @@ function draw() {
 
     case GameState.LEVEL_PLAY:
         ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
-        bow.drawOn(ctx);
+        bow.draw_on(ctx);
         for (let arrow of arrows) {
             ctx.drawImage(arrow_image, arrow.x, arrow.y);
         }
@@ -899,20 +1018,41 @@ function draw() {
         normal_font.draw_bottom_centered(ctx, 'You clearly need more practice');
         break;
 
+    case GameState.END_SCREEN:
+        ctx.drawImage(sky_image, 0, 0, sky_image.width, sky_image.height, 0, 0, canvas_width, canvas_height);
+        big_font.draw_centered(ctx, `Congratulations!\nYou finished the game`);
+        normal_font.draw_bottom_centered(ctx, 'I hope you liked it.');
+        ctx.save();
+            if (blink_val < 50) {
+                ctx.globalAlpha = blink_val * 0.02;
+            } else if (blink_val < 75) {
+                // alpha == 1
+            } else {
+                ctx.globalAlpha = (125 - blink_val) * 0.02;
+            }
+            status_font.draw_centered(ctx, 'Left click to start again!', 50);
+        ctx.restore();
+
     }
 
-    status_font.draw(ctx, 5, 20, 'score');
-    status_number_font.draw(ctx, 35, 20, score_to_str(score));
-    status_font.draw(ctx, 11, 35, 'best');
-    status_number_font.draw(ctx, 35, 35, score_to_str(localStorage['best_score']));
-    status_font.draw(ctx, canvas_width - 35, 20, 'arrows');
-    ctx.fillStyle = '#e1d1ac';
-    for (let pos_x = canvas_width - 42, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
-        ctx.fillRect(pos_x, 12, 1, 8);
+    if (game_state != GameState.TITLE_SCREEN) {
+        status_font.draw(ctx, 5, 20, 'score');
+        status_number_font.draw(ctx, 35, 20, score_to_str(score));
+        status_font.draw(ctx, 11, 35, 'best');
+        status_number_font.draw(ctx, 35, 35, score_to_str(localStorage['best_score']));
+
+        if (game_state != GameState.END_SCREEN) {
+            status_font.draw(ctx, canvas_width - 35, 20, 'arrows');
+            ctx.fillStyle = '#e1d1ac';
+            for (let pos_x = canvas_width - 42, arrows_drawn = 0; arrows_drawn < arrows_remaining; ++arrows_drawn, pos_x -= 3) {
+                ctx.fillRect(pos_x, 12, 1, 8);
+            }
+        }
     }
-    if (debug) {
-        status_font.draw(ctx, canvas_width - 70, 45, `used colors: ${check_colors_and_get_count()}`);
-    }
+
+    // if (debug) {
+    //     status_font.draw(ctx, canvas_width - 70, 45, `used colors: ${check_colors_and_get_count()}`);
+    // }
 
     requestAnimationFrame(draw);
 }
@@ -922,12 +1062,93 @@ function update() {
     if (blink_val >= 125) {
         blink_val = 0;
     }
-    if (game_state == GameState.LEVEL_PLAY) {
+
+    switch (game_state) {
+    case GameState.LEVEL_PLAY:
         level.update(arrows);
         arrows = arrows.filter(arrow => {
             arrow.x += arrow.speed;
             return arrow.x < canvas_width && arrow.x > -arrow_width;
         });
+        break;
+
+    case GameState.TITLE_SCREEN:
+        switch (title_screen_state) {
+        case TitleScreenState.REVEALING_BOW:
+            if (bow.pos_y < 142) {
+                bow.pos_y += 2;
+            } else {
+                title_screen_state = TitleScreenState.FIRING_ARROW_1;
+            }
+            break;
+
+        case TitleScreenState.FIRING_ARROW_1:
+            bow.load_arrow();
+            bow.strain();
+            bow.release_arrow(arrow => {
+                title_screen_state = TitleScreenState.BOW_TIMEOUT;
+                title_screen_arrows.push(arrow);
+                setTimeout(_ => {
+                    title_screen_state = TitleScreenState.MOVING_BOW_1;
+                }, 500);
+            });
+            break;
+
+        case TitleScreenState.MOVING_BOW_1:
+            if (bow.pos_y < 172) {
+                bow.pos_y += 1;
+            } else {
+                title_screen_state = TitleScreenState.FIRING_ARROW_2;
+            }
+            break;
+
+        case TitleScreenState.FIRING_ARROW_2:
+            bow.load_arrow();
+            bow.strain();
+            bow.release_arrow(arrow => {
+                title_screen_state = TitleScreenState.BOW_TIMEOUT;
+                title_screen_arrows.push(arrow);
+                setTimeout(_ => {
+                    title_screen_state = TitleScreenState.MOVING_BOW_2;
+                }, 500);
+            });
+            break;
+
+        case TitleScreenState.MOVING_BOW_2:
+            if (bow.pos_y < 202) {
+                bow.pos_y += 1;
+            } else {
+                title_screen_state = TitleScreenState.FIRING_ARROW_3;
+            }
+            break;
+
+        case TitleScreenState.FIRING_ARROW_3:
+            bow.load_arrow();
+            bow.strain();
+            bow.release_arrow(arrow => {
+                title_screen_state = TitleScreenState.BOW_TIMEOUT;
+                title_screen_arrows.push(arrow);
+                setTimeout(_ => {
+                    title_screen_state = TitleScreenState.MOVING_BOW_3;
+                }, 500);
+            });
+            break;
+
+        case TitleScreenState.MOVING_BOW_3:
+            if (bow.pos_y > 80) {
+                bow.pos_y -= 1;
+            } else {
+                if (title_screen_arrows[2] && title_screen_arrows[2].x > canvas_width) {
+                    title_screen_arrows = [];
+                    title_screen_state = TitleScreenState.AFTER_INTRO;
+                }
+            }
+            break;
+        }
+        for (let arrow of title_screen_arrows) {
+            arrow.x += 2;
+        }
+        break;
     }
     if (score_to_add > 0) {
         ++score;
@@ -939,7 +1160,6 @@ function update() {
     setTimeout(update, 20);
 }
 
-onlevelend(); // argument undefined on purpose
 update();
 draw();
 

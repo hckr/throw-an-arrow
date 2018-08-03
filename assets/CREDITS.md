@@ -42,7 +42,7 @@ Adapted from the work of [second][13], [CC0 1.0][4].
 
 ## fonts/*
 
-Fonts from [Kenney][7] converted to bitmap using [FontBuilder][8].
+Fonts from [Kenney][7] converted to bitmaps using [FontBuilder][8].
 
 
 [1]: https://opengameart.org/content/generic-8-bit-jrpg-soundtrack

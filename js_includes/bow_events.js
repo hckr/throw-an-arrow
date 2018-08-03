@@ -24,7 +24,7 @@ c.addEventListener('mouseup', e => {
 });
 
 c.addEventListener('mousemove', e => {
-    if (mouse_down) {
+    if (game_state == GameState.LEVEL_PLAY && mouse_down) {
         bow.move_y(e.movementY * canvas_height / canvas_real_height);
     }
 });

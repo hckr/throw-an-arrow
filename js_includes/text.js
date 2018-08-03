@@ -31,8 +31,6 @@ class TextDrawer {
         for (let char of uptext) {
             let layout = this.layout[char];
             if (layout) {
-                // let [cx, cy, cw, ch] = layout['rect'];
-                // let [ox, oy] = layout['offset'];
                 width += layout['advance'];
 
             } else if (char == '\n') {

@@ -13,5 +13,9 @@ class Balloons2 extends BalloonLevelBase {
             faster = !faster;
         }
         super(onlevelend, 25, balloons);
+
+        this.title = 'More balloons';
+        this.description = `
+You might want to wait until they form a single line.`.trim();
     }
 }

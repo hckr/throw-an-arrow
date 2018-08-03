@@ -5,6 +5,14 @@ class Violet2 extends VioletLevelBase {
         super(onlevelend, 55);
         this.minions = [];
         setTimeout(_ => this.release_minion(true), 1500);
+
+        this.title = 'Even worse weather';
+        this.description = `
+The clouds are not giving up!
+Now they can shoot something which
+is stopping your arrows
+and can damage your bow!
+(Just let it fly away, don't waste arrows.)`.trim();
     }
 
     release_minion(timeout) {

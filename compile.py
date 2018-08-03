@@ -58,7 +58,7 @@ def replace_ghltojsobj(match):
                 'rect': [int(x) for x in char['@rect'].split()],
                 'offset': [int(x) for x in char['@offset'].split()]
             }
-    return re.sub(r'"([a-zA-Z]+)"', r'\1', json.dumps(data)).replace('"', "'")
+    return re.sub(r'"([a-zA-Z]+)"', r'\1', json.dumps(data)).replace("'", r"\'").replace('"', "'")
 
 
 def replace_colorizedfontdatauri(match):

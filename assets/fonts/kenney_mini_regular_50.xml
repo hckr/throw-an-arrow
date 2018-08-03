@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font type="GHL">
+ <description family="Kenney Mini" size="50" style="Regular"/>
+ <metrics ascender="50" descender="-13" height="63"/>
+ <texture height="31" file="kenney_mini_regular_50.png" width="454"/>
+ <chars>
+  <char id=" " advance="6" offset="0 0" rect="0 31 0 0"/>
+  <char id="!" advance="6" offset="0 31" rect="0 0 3 31"/>
+  <char id="0" advance="15" offset="0 31" rect="3 0 13 31"/>
+  <char id="1" advance="9" offset="0 31" rect="16 0 6 31"/>
+  <char id="2" advance="15" offset="0 31" rect="22 0 13 31"/>
+  <char id="3" advance="15" offset="0 31" rect="35 0 13 31"/>
+  <char id="4" advance="15" offset="0 31" rect="48 0 13 31"/>
+  <char id="5" advance="15" offset="0 31" rect="61 0 13 31"/>
+  <char id="6" advance="15" offset="0 31" rect="74 0 13 31"/>
+  <char id="7" advance="15" offset="0 31" rect="87 0 13 31"/>
+  <char id="8" advance="15" offset="0 31" rect="100 0 13 31"/>
+  <char id="9" advance="15" offset="0 31" rect="113 0 13 31"/>
+  <char id=":" advance="6" offset="0 25" rect="126 6 3 19"/>
+  <char id="A" advance="15" offset="0 31" rect="129 0 13 31"/>
+  <char id="B" advance="15" offset="0 31" rect="142 0 13 31"/>
+  <char id="C" advance="15" offset="0 31" rect="155 0 13 31"/>
+  <char id="D" advance="15" offset="0 31" rect="168 0 13 31"/>
+  <char id="E" advance="15" offset="0 31" rect="181 0 13 31"/>
+  <char id="F" advance="15" offset="0 31" rect="194 0 13 31"/>
+  <char id="G" advance="15" offset="0 31" rect="207 0 13 31"/>
+  <char id="H" advance="15" offset="0 31" rect="220 0 13 31"/>
+  <char id="I" advance="6" offset="0 31" rect="233 0 3 31"/>
+  <char id="J" advance="12" offset="0 31" rect="236 0 9 31"/>
+  <char id="K" advance="15" offset="0 31" rect="245 0 13 31"/>
+  <char id="L" advance="12" offset="0 31" rect="258 0 9 31"/>
+  <char id="M" advance="18" offset="0 31" rect="267 0 16 31"/>
+  <char id="N" advance="15" offset="0 31" rect="283 0 13 31"/>
+  <char id="O" advance="15" offset="0 31" rect="296 0 13 31"/>
+  <char id="P" advance="15" offset="0 31" rect="309 0 13 31"/>
+  <char id="Q" advance="15" offset="0 31" rect="322 0 13 31"/>
+  <char id="R" advance="15" offset="0 31" rect="335 0 13 31"/>
+  <char id="S" advance="15" offset="0 31" rect="348 0 13 31"/>
+  <char id="T" advance="12" offset="0 31" rect="361 0 9 31"/>
+  <char id="U" advance="15" offset="0 31" rect="370 0 13 31"/>
+  <char id="V" advance="18" offset="0 31" rect="383 0 16 31"/>
+  <char id="W" advance="18" offset="0 31" rect="399 0 16 31"/>
+  <char id="X" advance="15" offset="0 31" rect="415 0 13 31"/>
+  <char id="Y" advance="15" offset="0 31" rect="428 0 13 31"/>
+  <char id="Z" advance="15" offset="0 31" rect="441 0 13 31"/>
+ </chars>
+</font>

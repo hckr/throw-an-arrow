@@ -71,8 +71,7 @@ function check_colors_and_get_count() {
         }
         colors.add([r, g, b].toString());
     }
-    let count = colors.size;
-    return count;
+    return colors.size;
 }
 
 let audioCtx = new AudioContext(),
@@ -301,6 +300,14 @@ class Balloons1 extends BalloonLevelBase {
             });
         }
         super(onlevelend, 18, balloons);
+
+        this.title = 'Balloons';
+        this.description = `
+Use a mouse to control the bow:
+right click to load an arrow,
+left click (and hold) to strain the bow,
+and release... to release the arrow.
+Move the bow while left clicking and holding.`.trim();
     }
 }
 
@@ -319,6 +326,10 @@ class Balloons2 extends BalloonLevelBase {
             faster = !faster;
         }
         super(onlevelend, 25, balloons);
+
+        this.title = 'More balloons';
+        this.description = `
+You might want to wait until they form a single line.`.trim();
     }
 }
 
@@ -344,6 +355,10 @@ class Bubbles1 {
         }
 
         this.bg_image = sky_image;
+
+        this.title = 'Bubbles';
+        this.description = `
+Pop bubbles to rescue butterflies!`.trim();
     }
 
     draw_on(ctx) {
@@ -391,8 +406,8 @@ class Bubbles1 {
             return !(bubble.pierced && bubble.frame >= 9);
         });
         this.butterflies = this.butterflies.filter(butterfly => {
-            butterfly.x -= 1;
-            butterfly.y -= 1;
+            butterfly.x -= 2;
+            butterfly.y -= 2;
             butterfly.frame = (butterfly.frame + 1) % 8;
             return butterfly.y > -butterfly_frame_height;
         });
@@ -524,6 +539,13 @@ class VioletLevelBase {
 class Violet1 extends VioletLevelBase {
     constructor(onlevelend) {
         super(onlevelend, 45);
+
+        this.title = 'Bad weather';
+        this.description = `
+Some angry clouds are on their way.
+Don't let them ruin the weather.
+You have to hit them multiple times
+until they go away.`.trim();
     }
 }
 
@@ -534,6 +556,14 @@ class Violet2 extends VioletLevelBase {
         super(onlevelend, 55);
         this.minions = [];
         setTimeout(_ => this.release_minion(true), 1500);
+
+        this.title = 'Even worse weather';
+        this.description = `
+The clouds are not giving up!
+Now they can shoot something which
+is stopping your arrows
+and can damage your bow!
+(Just let it fly away, don't waste arrows.)`.trim();
     }
 
     release_minion(timeout) {
@@ -612,7 +642,7 @@ c.addEventListener('mousedown', e => {
         mouse_down = true;
         break;
     case 3:
-        if (arrows_remaining && !level_change) {
+        if (arrows_remaining && game_state == GameState.LEVEL_PLAY) {
             if (bow.load_arrow()) { // returns false if cannot load
                 --arrows_remaining;
             }
@@ -634,29 +664,76 @@ c.addEventListener('mousemove', e => {
     }
 });
 
-function TextDrawer(image, layout, line_height) {
-    this.image = image;
-    this.layout = layout;
-    this.line_height = line_height;
-}
+class TextDrawer {
+    constructor(image, layout, line_height) {
+        this.image = image;
+        this.layout = layout;
+        this.line_height = line_height;
+    }
 
-TextDrawer.prototype.draw = function(ctx, x, y, text) {
-    text = ('' + text).toUpperCase();
-    let pos_x = x,
-        pos_y = y;
-    for (let char of text) {
-        let layout = this.layout[char];
-        if (layout) {
-            let [cx, cy, cw, ch] = layout['rect'];
-            let [ox, oy] = layout['offset'];
-            ctx.drawImage(this.image, cx, cy, cw, ch, pos_x - ox, pos_y - oy, cw, ch);
-            pos_x += layout['advance'];
-        } else if (char == '\n') {
-            pos_x = x;
+    draw(ctx, x, y, text) {
+        let uptext = ('' + text).toUpperCase(),
+            pos_x = x,
+            pos_y = y;
+        for (let char of uptext) {
+            let layout = this.layout[char];
+            if (layout) {
+                let [cx, cy, cw, ch] = layout['rect'];
+                let [ox, oy] = layout['offset'];
+                ctx.drawImage(this.image, cx, cy, cw, ch, pos_x - ox, pos_y - oy, cw, ch);
+                pos_x += layout['advance'];
+            } else if (char == '\n') {
+                pos_x = x;
+                pos_y += this.line_height;
+            }
+        }
+    }
+
+    measure(text) {
+        let uptext = ('' + text).toUpperCase(),
+            max_width = 0,
+            width = 0,
+            height = this.line_height;
+        for (let char of uptext) {
+            let layout = this.layout[char];
+            if (layout) {
+                // let [cx, cy, cw, ch] = layout['rect'];
+                // let [ox, oy] = layout['offset'];
+                width += layout['advance'];
+
+            } else if (char == '\n') {
+                max_width = Math.max(width, max_width);
+                width = 0;
+                height += this.line_height;
+            }
+        }
+        return [Math.max(width, max_width), height]
+    }
+
+    draw_centered(ctx, text, y) {
+        let pos_y = y,
+            uptext = ('' + text).toUpperCase(),
+            lines = uptext.split('\n');
+        if (pos_y === undefined) {
+            let height = (lines.length - 1) * this.line_height;
+            pos_y = ((ctx.canvas.height - height) / 2) | 0;
+        }
+        for (let line of lines) {
+            let pos_x = ((ctx.canvas.width - this.measure(line)[0]) / 2) | 0;
+            this.draw(ctx, pos_x, pos_y, line);
             pos_y += this.line_height;
         }
     }
+
+    draw_bottom_centered(ctx, text) {
+        let uptext = ('' + text).toUpperCase(),
+            lines = uptext.split('\n'),
+            height = (lines.length - 1) * this.line_height,
+            y = ctx.canvas.height - height - 10;
+        this.draw_centered(ctx, text, y)
+    }
 }
+
 
 let status_font_image = new Image();
 status_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI0AAAAICAYAAADEI3zOAAABHUlEQVR42u1WyRHCMAzcZdx/JTRDCVQiHsCMEbZ1xXlFrzi6b/H5uAsAAhC8of/uQf//vvl5e3hWeC2HHZ0sbMBCxwhP452RO6O36Cx/ov5G4+iJ/5+uGy64IAitqyaqbxlU6ahqZ5U+4oHCibPCPR2LiS9w+GH55elwFLo4+8YgZzvgJz7NwRA1JJJ8JB2VIr0UZR6dHCnYz7NtaMFqk+DN4qlevWdH94YEbDojgLv0R25AbNJr3nPNMESPbhoThY6JIxOeEX/4SEusTMkE7uCJQ6NwrRh7VyUXU1br4OSMQFPJrI5iqYy9wCST4nv3+ti53uTAHEhmJd4Glc5Cd6zwNGgYlA/VERm8ZwUiERuvDBZXEB2yudgSmTziBSITjmXab+DjAAAAAElFTkSuQmCC';
@@ -667,6 +744,16 @@ let status_number_font_image = new Image();
 status_number_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAICAYAAAC73qx6AAAAdElEQVR42mN8eHHNfwb8gBFKE1KHTQ+p+sgGTAzDBLDgCEFsscCIpvc/DjFiYgmXfgYc5jESEmOhY6D9J0KMkdIYoZZDaJUvCNpNaowQkxRISYL4CgWYvv94kj5JSes/LZICGTFAVNL6T6ZBlKojtnAg6D4AN4gmaroLxoEAAAAASUVORK5CYII=';
 let status_number_font_layout = {'0': {advance: 6, rect: [0, 0, 5, 8], offset: [0, 8]}, '1': {advance: 6, rect: [5, 0, 5, 8], offset: [0, 8]}, '2': {advance: 6, rect: [10, 0, 5, 8], offset: [0, 8]}, '3': {advance: 6, rect: [15, 0, 5, 8], offset: [0, 8]}, '4': {advance: 6, rect: [20, 0, 5, 8], offset: [0, 8]}, '5': {advance: 6, rect: [25, 0, 5, 8], offset: [0, 8]}, '6': {advance: 6, rect: [30, 0, 5, 8], offset: [0, 8]}, '7': {advance: 6, rect: [35, 0, 5, 8], offset: [0, 8]}, '8': {advance: 6, rect: [40, 0, 5, 8], offset: [0, 8]}, '9': {advance: 6, rect: [45, 0, 5, 8], offset: [0, 8]}};
 let status_number_font = new TextDrawer(status_number_font_image, status_number_font_layout, 20);
+
+let big_font_image = new Image();
+big_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcYAAAAfCAYAAAB9JG16AAAB3UlEQVR42u3dW3LrIAwAUOhk/4vpqu5P16B+9nEnHkcITNJzvtqOZWwQVtyhtH/8e4/2pX/7+vvP251jjo47I3Ouo5h+J2bkGh/pm7aonX4Qn4lpk8Y9c50VeZRppy+KaYvydaSNyuvqhXl6dW7uPAdmjXkmPhJz5Oo8/eGtAQAKIwAojACgMAKAwggAKbdf32dWePYH48+e62zMqMxqzV7YfhSMQRuMaRe0WdnvcdH4jsZU5mssfnacXYUYm+ZZPNEcaCf7mnw/hzdGALhDYQQAhREAFEYAUBgB4BG3Re3M3Hd1dGVW5Z6NZ88Rg+0c9dvoPp+x2fjOyr3qmEx8PPncewar7n/VXH0ls/aFHh4nb4wAoDACgMIIAAojACiMAJA0c1Xqs69yq94XsXKlYky8v63+k3aBv77vaX/R+Vk9/n+9n6/YgzXzrOuT2vmvMK7ohF54XMUD+orNyiv7Y7f74f546PfX/YA8a+7Hxnk6K7e32rjdr1IBQGEEAIURABRGAFAYASDp1h5fprtkueyBiuXXkWgnJvXN0TkqN0DuE8dnqw2AJ+ZeZqyqxYJr2Wkl7az5cNVYjs7Vyn46Ez/6p0txQZ4Ob9zujREAFEYAUBgBQGEEAIURAJI+Ad04lbJYI1IrAAAAAElFTkSuQmCC';
+let big_font_layout = {' ': {advance: 6, rect: [0, 31, 0, 0], offset: [0, 0]}, '!': {advance: 6, rect: [0, 0, 3, 31], offset: [0, 31]}, '0': {advance: 15, rect: [3, 0, 13, 31], offset: [0, 31]}, '1': {advance: 9, rect: [16, 0, 6, 31], offset: [0, 31]}, '2': {advance: 15, rect: [22, 0, 13, 31], offset: [0, 31]}, '3': {advance: 15, rect: [35, 0, 13, 31], offset: [0, 31]}, '4': {advance: 15, rect: [48, 0, 13, 31], offset: [0, 31]}, '5': {advance: 15, rect: [61, 0, 13, 31], offset: [0, 31]}, '6': {advance: 15, rect: [74, 0, 13, 31], offset: [0, 31]}, '7': {advance: 15, rect: [87, 0, 13, 31], offset: [0, 31]}, '8': {advance: 15, rect: [100, 0, 13, 31], offset: [0, 31]}, '9': {advance: 15, rect: [113, 0, 13, 31], offset: [0, 31]}, ':': {advance: 6, rect: [126, 6, 3, 19], offset: [0, 25]}, A: {advance: 15, rect: [129, 0, 13, 31], offset: [0, 31]}, B: {advance: 15, rect: [142, 0, 13, 31], offset: [0, 31]}, C: {advance: 15, rect: [155, 0, 13, 31], offset: [0, 31]}, D: {advance: 15, rect: [168, 0, 13, 31], offset: [0, 31]}, E: {advance: 15, rect: [181, 0, 13, 31], offset: [0, 31]}, F: {advance: 15, rect: [194, 0, 13, 31], offset: [0, 31]}, G: {advance: 15, rect: [207, 0, 13, 31], offset: [0, 31]}, H: {advance: 15, rect: [220, 0, 13, 31], offset: [0, 31]}, I: {advance: 6, rect: [233, 0, 3, 31], offset: [0, 31]}, J: {advance: 12, rect: [236, 0, 9, 31], offset: [0, 31]}, K: {advance: 15, rect: [245, 0, 13, 31], offset: [0, 31]}, L: {advance: 12, rect: [258, 0, 9, 31], offset: [0, 31]}, M: {advance: 18, rect: [267, 0, 16, 31], offset: [0, 31]}, N: {advance: 15, rect: [283, 0, 13, 31], offset: [0, 31]}, O: {advance: 15, rect: [296, 0, 13, 31], offset: [0, 31]}, P: {advance: 15, rect: [309, 0, 13, 31], offset: [0, 31]}, Q: {advance: 15, rect: [322, 0, 13, 31], offset: [0, 31]}, R: {advance: 15, rect: [335, 0, 13, 31], offset: [0, 31]}, S: {advance: 15, rect: [348, 0, 13, 31], offset: [0, 31]}, T: {advance: 12, rect: [361, 0, 9, 31], offset: [0, 31]}, U: {advance: 15, rect: [370, 0, 13, 31], offset: [0, 31]}, V: {advance: 18, rect: [383, 0, 16, 31], offset: [0, 31]}, W: {advance: 18, rect: [399, 0, 16, 31], offset: [0, 31]}, X: {advance: 15, rect: [415, 0, 13, 31], offset: [0, 31]}, Y: {advance: 15, rect: [428, 0, 13, 31], offset: [0, 31]}, Z: {advance: 15, rect: [441, 0, 13, 31], offset: [0, 31]}};
+let big_font = new TextDrawer(big_font_image, big_font_layout, 50);
+
+let normal_font_image = new Image();
+normal_font_image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAAALCAYAAACZDKRCAAABQklEQVR42u1YS3LFMAhDnZy+52nPx1t00nH9bBCfzHRhreJfbDAIJfj6/Fb5AURkfB6xmjNi7r/bmNZba6xxLM7hnc3aezcOp515726+N8+zJ2pv1I+M/9/2+pCDg0ZcU4SCfNZFdK+ifZchqzUzIyqZGUym72wUwg7PLoYZpJD92bYs7uwJ/PHPYaiDRxgqG8HqaA015ltMs9MLK32jQb23s8FiISXYN7u/FN/n+aiDgTzt9Dt+NRhaddLY1sAlhgVjogxnShwa/COBoKjsx5RDdWSKzgyFJmPhXDbIYITDWp2XlcnS/wBWo0ZsQuHLFWNA3ZeFDb0yvxOYrLLKFQiqZT+RaXomg7ta4jQZuKyMsHzslS4YyaqZMntE+UG7KIcT1VZ/RQcwfQjMR1GDRMer52F8jeJ5OnyIyBkPQx204gWQZZkcNmwt+gAAAABJRU5ErkJggg==';
+let normal_font_layout = {' ': {advance: 2, rect: [0, 9, 0, 0], offset: [0, 0]}, '!': {advance: 2, rect: [0, 0, 1, 9], offset: [0, 9]}, '\'': {advance: 2, rect: [1, 0, 1, 4], offset: [0, 9]}, '(': {advance: 3, rect: [2, 0, 2, 9], offset: [0, 9]}, ')': {advance: 3, rect: [4, 0, 2, 9], offset: [0, 9]}, ',': {advance: 2, rect: [6, 7, 1, 4], offset: [0, 2]}, '.': {advance: 2, rect: [7, 7, 1, 2], offset: [0, 2]}, '0': {advance: 5, rect: [8, 0, 4, 9], offset: [0, 9]}, '1': {advance: 3, rect: [12, 0, 2, 9], offset: [0, 9]}, '2': {advance: 5, rect: [14, 0, 4, 9], offset: [0, 9]}, '3': {advance: 5, rect: [18, 0, 4, 9], offset: [0, 9]}, '4': {advance: 5, rect: [22, 0, 4, 9], offset: [0, 9]}, '5': {advance: 5, rect: [26, 0, 4, 9], offset: [0, 9]}, '6': {advance: 5, rect: [30, 0, 4, 9], offset: [0, 9]}, '7': {advance: 5, rect: [34, 0, 4, 9], offset: [0, 9]}, '8': {advance: 5, rect: [38, 0, 4, 9], offset: [0, 9]}, '9': {advance: 5, rect: [42, 0, 4, 9], offset: [0, 9]}, ':': {advance: 2, rect: [46, 2, 1, 5], offset: [0, 7]}, A: {advance: 5, rect: [47, 0, 4, 9], offset: [0, 9]}, B: {advance: 5, rect: [51, 0, 4, 9], offset: [0, 9]}, C: {advance: 5, rect: [55, 0, 4, 9], offset: [0, 9]}, D: {advance: 5, rect: [59, 0, 4, 9], offset: [0, 9]}, E: {advance: 5, rect: [63, 0, 4, 9], offset: [0, 9]}, F: {advance: 5, rect: [67, 0, 4, 9], offset: [0, 9]}, G: {advance: 5, rect: [71, 0, 4, 9], offset: [0, 9]}, H: {advance: 5, rect: [75, 0, 4, 9], offset: [0, 9]}, I: {advance: 2, rect: [79, 0, 1, 9], offset: [0, 9]}, J: {advance: 4, rect: [80, 0, 3, 9], offset: [0, 9]}, K: {advance: 5, rect: [83, 0, 4, 9], offset: [0, 9]}, L: {advance: 4, rect: [87, 0, 3, 9], offset: [0, 9]}, M: {advance: 6, rect: [90, 0, 5, 9], offset: [0, 9]}, N: {advance: 5, rect: [95, 0, 4, 9], offset: [0, 9]}, O: {advance: 5, rect: [99, 0, 4, 9], offset: [0, 9]}, P: {advance: 5, rect: [103, 0, 4, 9], offset: [0, 9]}, Q: {advance: 5, rect: [107, 0, 4, 9], offset: [0, 9]}, R: {advance: 5, rect: [111, 0, 4, 9], offset: [0, 9]}, S: {advance: 5, rect: [115, 0, 4, 9], offset: [0, 9]}, T: {advance: 4, rect: [119, 0, 3, 9], offset: [0, 9]}, U: {advance: 5, rect: [122, 0, 4, 9], offset: [0, 9]}, V: {advance: 6, rect: [126, 0, 5, 9], offset: [0, 9]}, W: {advance: 6, rect: [131, 0, 5, 9], offset: [0, 9]}, X: {advance: 5, rect: [136, 0, 4, 9], offset: [0, 9]}, Y: {advance: 5, rect: [140, 0, 4, 9], offset: [0, 9]}, Z: {advance: 5, rect: [144, 0, 4, 9], offset: [0, 9]}};
+let normal_font = new TextDrawer(normal_font_image, normal_font_layout, 15);
 
 let shoot_sound = 'data:audio/ogg;base64,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',
     burst_sound = 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAAAvOjQDAAAAANMfMEoBHgF2b3JiaXMAAAAAASgjAAAAAAAAIE4AAAAAAACZAU9nZ1MAAAAAAAAAAAAALzo0AwEAAAAWKsQ8C0X///////////+1A3ZvcmJpczUAAABYaXBoLk9yZyBsaWJWb3JiaXMgSSAyMDE4MDMxNiAoTm93IDEwMCUgZmV3ZXIgc2hlbGxzKQAAAAABBXZvcmJpcxJCQ1YBAAABAAxSFCElGVNKYwiVUlIpBR1jUFtHHWPUOUYhZBBTiEkZpXtPKpVYSsgRUlgpRR1TTFNJlVKWKUUdYxRTSCFT1jFloXMUS4ZJCSVsTa50FkvomWOWMUYdY85aSp1j1jFFHWNSUkmhcxg6ZiVkFDpGxehifDA6laJCKL7H3lLpLYWKW4q91xpT6y2EGEtpwQhhc+211dxKasUYY4wxxsXiUyiC0JBVAAABAABABAFCQ1YBAAoAAMJQDEVRgNCQVQBABgCAABRFcRTHcRxHkiTLAkJDVgEAQAAAAgAAKI7hKJIjSZJkWZZlWZameZaouaov+64u667t6roOhIasBADIAAAYhiGH3knMkFOQSSYpVcw5CKH1DjnlFGTSUsaYYoxRzpBTDDEFMYbQKYUQ1E45pQwiCENInWTOIEs96OBi5zgQGrIiAIgCAACMQYwhxpBzDEoGIXKOScggRM45KZ2UTEoorbSWSQktldYi55yUTkompbQWUsuklNZCKwUAAAQ4AAAEWAiFhqwIAKIAABCDkFJIKcSUYk4xh5RSjinHkFLMOcWYcowx6CBUzDHIHIRIKcUYc0455iBkDCrmHIQMMgEAAAEOAAABFkKhISsCgDgBAIMkaZqlaaJoaZooeqaoqqIoqqrleabpmaaqeqKpqqaquq6pqq5seZ5peqaoqp4pqqqpqq5rqqrriqpqy6ar2rbpqrbsyrJuu7Ks256qyrapurJuqq5tu7Js664s27rkearqmabreqbpuqrr2rLqurLtmabriqor26bryrLryratyrKua6bpuqKr2q6purLtyq5tu7Ks+6br6rbqyrquyrLu27au+7KtC7vourauyq6uq7Ks67It67Zs20LJ81TVM03X9UzTdVXXtW3VdW1bM03XNV1XlkXVdWXVlXVddWVb90zTdU1XlWXTVWVZlWXddmVXl0XXtW1Vln1ddWVfl23d92VZ133TdXVblWXbV2VZ92Vd94VZt33dU1VbN11X103X1X1b131htm3fF11X11XZ1oVVlnXf1n1lmHWdMLqurqu27OuqLOu+ruvGMOu6MKy6bfyurQvDq+vGseu+rty+j2rbvvDqtjG8um4cu7Abv+37xrGpqm2brqvrpivrumzrvm/runGMrqvrqiz7uurKvm/ruvDrvi8Mo+vquirLurDasq/Lui4Mu64bw2rbwu7aunDMsi4Mt+8rx68LQ9W2heHVdaOr28ZvC8PSN3a+AACAAQcAgAATykChISsCgDgBAAYhCBVjECrGIIQQUgohpFQxBiFjDkrGHJQQSkkhlNIqxiBkjknIHJMQSmiplNBKKKWlUEpLoZTWUmotptRaDKG0FEpprZTSWmopttRSbBVjEDLnpGSOSSiltFZKaSlzTErGoKQOQiqlpNJKSa1lzknJoKPSOUippNJSSam1UEproZTWSkqxpdJKba3FGkppLaTSWkmptdRSba21WiPGIGSMQcmck1JKSamU0lrmnJQOOiqZg5JKKamVklKsmJPSQSglg4xKSaW1kkoroZTWSkqxhVJaa63VmFJLNZSSWkmpxVBKa621GlMrNYVQUgultBZKaa21VmtqLbZQQmuhpBZLKjG1FmNtrcUYSmmtpBJbKanFFluNrbVYU0s1lpJibK3V2EotOdZaa0ot1tJSjK21mFtMucVYaw0ltBZKaa2U0lpKrcXWWq2hlNZKKrGVklpsrdXYWow1lNJiKSm1kEpsrbVYW2w1ppZibLHVWFKLMcZYc0u11ZRai621WEsrNcYYa2415VIAAMCAAwBAgAlloNCQlQBAFAAAYAxjjEFoFHLMOSmNUs45JyVzDkIIKWXOQQghpc45CKW01DkHoZSUQikppRRbKCWl1losAACgwAEAIMAGTYnFAQoNWQkARAEAIMYoxRiExiClGIPQGKMUYxAqpRhzDkKlFGPOQcgYc85BKRljzkEnJYQQQimlhBBCKKWUAgAAChwAAAJs0JRYHKDQkBUBQBQAAGAMYgwxhiB0UjopEYRMSielkRJaCylllkqKJcbMWomtxNhICa2F1jJrJcbSYkatxFhiKgAA7MABAOzAQig0ZCUAkAcAQBijFGPOOWcQYsw5CCE0CDHmHIQQKsaccw5CCBVjzjkHIYTOOecghBBC55xzEEIIoYMQQgillNJBCCGEUkrpIIQQQimldBBCCKGUUgoAACpwAAAIsFFkc4KRoEJDVgIAeQAAgDFKOSclpUYpxiCkFFujFGMQUmqtYgxCSq3FWDEGIaXWYuwgpNRajLV2EFJqLcZaQ0qtxVhrziGl1mKsNdfUWoy15tx7ai3GWnPOuQAA3AUHALADG0U2JxgJKjRkJQCQBwBAIKQUY4w5h5RijDHnnENKMcaYc84pxhhzzjnnFGOMOeecc4wx55xzzjnGmHPOOeecc84556CDkDnnnHPQQeicc845CCF0zjnnHIQQCgAAKnAAAAiwUWRzgpGgQkNWAgDhAACAMZRSSimllFJKqKOUUkoppZRSAiGllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimVUkoppZRSSimllFJKKaUAIN8KBwD/BxtnWEk6KxwNLjRkJQAQDgAAGMMYhIw5JyWlhjEIpXROSkklNYxBKKVzElJKKYPQWmqlpNJSShmElGILIZWUWgqltFZrKam1lFIoKcUaS0qppdYy5ySkklpLrbaYOQelpNZaaq3FEEJKsbXWUmuxdVJSSa211lptLaSUWmstxtZibCWlllprqcXWWkyptRZbSy3G1mJLrcXYYosxxhoLAOBucACASLBxhpWks8LR4EJDVgIAIQEABDJKOeecgxBCCCFSijHnoIMQQgghREox5pyDEEIIIYSMMecghBBCCKGUkDHmHIQQQgghhFI65yCEUEoJpZRSSucchBBCCKWUUkoJIYQQQiillFJKKSGEEEoppZRSSiklhBBCKKWUUkoppYQQQiillFJKKaWUEEIopZRSSimllBJCCKGUUkoppZRSQgillFJKKaWUUkooIYRSSimllFJKCSWUUkoppZRSSikhlFJKKaWUUkoppQAAgAMHAIAAI+gko8oibDThwgMQAAAAAgACTACBAYKCUQgChBEIAAAAAAAIAPgAAEgKgIiIaOYMDhASFBYYGhweICIkAAAAAAAAAAAAAAAABE9nZ1MABI0KAAAAAAAALzo0AwIAAABOuAKdDElQTElHRUVFRUJCP65pcJYAFEWW/7WG5bI5koaHpnUqRx6fhe4P8RX3uy3WEzjaxgZw5oLA3zZcISIRczlkFEAo1F6Hgcgav7Z0ziAwgKXU3HWSEAC2LLkoANRqefqu5vWJ2RZNnXp+10t7bzAeDC+pOIca7bIfTvlkkrA6TEiz1QWkmKiEWyXN1wz3Tw4h9mATViE9dF1MwOl9FdkPaXZdC/fvAbIrZVEAKBbZzFCr4Wmag/epdbIXZCXnn+E8wsrQB2n7yK5dzqopipF+mb5hV1+Vn/Vom+z2ZccgdLqXK3lDXsvPaGamuqVZdh8oDACyZlCsBkBhIB+Pssr9k8npzTjZx1BdBhCGu1IBScvOpJ8n8hyfRXBRAuY0k2zSvcqb3SmLrKWwnWCoqIGdxEGXWGJzaU9rPUUeqqWryS4AWFBoaXdJkS3jUXLHaNyWVsRXmrubOXmEZAxQXSBcr0MH+pAtaN5V0oTxLZgKKRFMy/f+XszS4Q2njtS9KW+wjQKioRfVGkChSnfUouHZ2G37XA59bbRsDGQDoQ+37TlBSopo6W54UMOEGr7PJMnZkpKy69J2zvo+swNVp00a4yfL/cTlAACenfevSICcgfrySYDklVFrKfeNnhj2ozJJD/OVVNsRpxW2ktEGXXob7fU2696VK2NZ3JpSLZr2tIl2KQ0Mt8ssOLHpAQCeWnlvmZUAAFZUafmlQyLPzLUyvamIKHonIzIIHCeDZd2eO6/G4+xLGY3k6P5cWNDbx9OmV04rQzWwj/j2o7roD0efFwCeWERdqQQAKAT5lksVTigXS9HxXK+odh5b8LRwsiuvqOOaLURmHfDAOE+jfYrvarXskeHRxjzrhLJiE0uDLPFQbGXnIQWWVkVDZmMAAJVB+rUlIWQ4Ru1TUzHaAokPjDhwmHCpn3jXxmzDhswi7gPoYptmnVuBCbW3MgVwmTQuklQr9Ddz3wKOUsW3ogpgYeB/YgffyetmMmV1MjTJIr/V4RTwNOaR+ezqs2FLEMhKYswMTnkoL2hdLdZPEQ+eXWq8VOy1vcX+QwGGTcOdfBmDFKTOTd8vZDj4WcDE70kokkmKDnSQSUmWbCYediCPx2M2Au6PNV6egQqTcXBKNjOTAk7mxXL78gA=',
@@ -684,17 +771,31 @@ let bow = new Bow(80, 3),
     arrows = [],
     level_n,
     level,
-    level_change = false,
     last_arrow_timeout = null,
     score = 0,
-    score_to_add = 0;
+    score_to_add = 0,
+    blink_val = 0;
 
 localStorage['best_score'] = localStorage['best_score'] || 0;
+
+let GameState = Object.freeze({
+    LEVEL_INFO: 1,
+    LEVEL_PLAY: 2,
+    LEVEL_PASSED: 3,
+    LEVEL_FAILED: 4
+});
+let game_state = GameState.LEVEL_INFO;
+
+document.addEventListener('click', e => {
+    if (game_state == GameState.LEVEL_INFO && e.which == 1) {
+        game_state = GameState.LEVEL_PLAY;
+    }
+});
 
 function add_arrow(arrow) {
     arrows.push(arrow);
     if (!arrows_remaining) {
-        last_arrow_timeout = setTimeout(_ => onlevelend(false), 5000);
+        last_arrow_timeout = setTimeout(_ => onlevelend(false), 5500);
     }
 }
 
@@ -713,57 +814,91 @@ function change_remaining_arrows_to_score(callback) {
         --arrows_remaining;
         setTimeout(change_remaining_arrows_to_score, 1000, callback);
     } else {
-        setTimeout(callback, 1000);
+        setTimeout(callback, 3000);
     }
 }
 
-function run_level() {
+function prepare_level() {
     level = construct_level(level_n, onlevelend);
     arrows_remaining = level.arrows_limit;
-    level_change = false;
+    game_state = GameState.LEVEL_INFO;
 }
 
 function onlevelend(success) {
     clearTimeout(last_arrow_timeout);
     last_arrow_timeout = null;
-    level_change = true;
+
     bow.strain();
     bow.release_arrow(_=>{});
     arrows = [];
+
     if (success) {
         play(win_sound);
-        function cb() {
+        game_state = GameState.LEVEL_PASSED;
+        change_remaining_arrows_to_score(_ => {
             ++level_n;
             if (level_n > levels_count) {
                 level_n = 1;
             }
-            run_level();
-        }
-        if (arrows_remaining) {
-            change_remaining_arrows_to_score(cb);
-        } else {
-            cb();
-        }
+            prepare_level();
+        });
     } else {
         if (success === false) {
             play(lose_sound);
+            game_state = GameState.LEVEL_FAILED;
+            setTimeout(_ => {
+                level_n = 1;
+                score = 0;
+                prepare_level();
+            }, 5000);
+        } else {
+            level_n = 1;
+            score = 0;
+            prepare_level();
         }
-        level_n = 1;
-        score = 0;
-        run_level();
     }
 }
 
 function draw() {
-    if (!level_change) {
+    switch (game_state) {
+    case GameState.LEVEL_INFO:
+        ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
+        bow.drawOn(ctx);
+        big_font.draw_centered(ctx, `Level ${level_n}\n${level.title}`);
+        normal_font.draw_bottom_centered(ctx, level.description);
+        ctx.save();
+            if (blink_val < 50) {
+                ctx.globalAlpha = blink_val * 0.02;
+            } else if (blink_val < 75) {
+                // alpha == 1
+            } else {
+                ctx.globalAlpha = (125 - blink_val) * 0.02;
+            }
+            status_font.draw_centered(ctx, 'Left click to start!', 50);
+        ctx.restore();
+        break;
+
+    case GameState.LEVEL_PLAY:
         ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
         bow.drawOn(ctx);
         for (let arrow of arrows) {
             ctx.drawImage(arrow_image, arrow.x, arrow.y);
         }
         level.draw_on(ctx);
-    } else {
+        break;
+
+    case GameState.LEVEL_PASSED:
         ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, 18, 0, 0, canvas_width, 36);
+        big_font.draw_centered(ctx, `Well done!`);
+        normal_font.draw_bottom_centered(ctx, 'You get 50 points for each unused arrow');
+        break;
+
+    case GameState.LEVEL_FAILED:
+        ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, 18, 0, 0, canvas_width, 36);
+        big_font.draw_centered(ctx, `Not this time!`);
+        normal_font.draw_bottom_centered(ctx, 'You clearly need more practice');
+        break;
+
     }
 
     status_font.draw(ctx, 5, 20, 'score');
@@ -776,15 +911,18 @@ function draw() {
         ctx.fillRect(pos_x, 12, 1, 8);
     }
     if (debug) {
-        let count = check_colors_and_get_count();
-        status_font.draw(ctx, canvas_width - 70, 45, `used colors: ${count}`);
+        status_font.draw(ctx, canvas_width - 70, 45, `used colors: ${check_colors_and_get_count()}`);
     }
 
     requestAnimationFrame(draw);
 }
 
 function update() {
-    if (!level_change) {
+    blink_val += 1;
+    if (blink_val >= 125) {
+        blink_val = 0;
+    }
+    if (game_state == GameState.LEVEL_PLAY) {
         level.update(arrows);
         arrows = arrows.filter(arrow => {
             arrow.x += arrow.speed;

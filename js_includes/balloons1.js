@@ -11,5 +11,13 @@ class Balloons1 extends BalloonLevelBase {
             });
         }
         super(onlevelend, 18, balloons);
+
+        this.title = 'Balloons';
+        this.description = `
+Use a mouse to control the bow:
+right click to load an arrow,
+left click (and hold) to strain the bow,
+and release... to release the arrow.
+Move the bow while left clicking and holding.`.trim();
     }
 }

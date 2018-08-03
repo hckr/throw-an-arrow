@@ -71,6 +71,5 @@ function check_colors_and_get_count() {
         }
         colors.add([r, g, b].toString());
     }
-    let count = colors.size;
-    return count;
+    return colors.size;
 }

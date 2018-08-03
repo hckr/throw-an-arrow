@@ -20,6 +20,10 @@ class Bubbles1 {
         }
 
         this.bg_image = sky_image;
+
+        this.title = 'Bubbles';
+        this.description = `
+Pop bubbles to rescue butterflies!`.trim();
     }
 
     draw_on(ctx) {
@@ -67,8 +71,8 @@ class Bubbles1 {
             return !(bubble.pierced && bubble.frame >= 9);
         });
         this.butterflies = this.butterflies.filter(butterfly => {
-            butterfly.x -= 1;
-            butterfly.y -= 1;
+            butterfly.x -= 2;
+            butterfly.y -= 2;
             butterfly.frame = (butterfly.frame + 1) % 8;
             return butterfly.y > -butterfly_frame_height;
         });

@@ -80,4 +80,8 @@ Pop bubbles to rescue butterflies!`.trim();
             onlevelend(true);
         }
     }
+
+    can_safely_fail() {
+        return this.butterflies.length == 0;
+    }
 }

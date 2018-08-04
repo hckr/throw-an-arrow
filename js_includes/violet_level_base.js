@@ -114,4 +114,8 @@ class VioletLevelBase {
         });
         this.check_if_level_end();
     }
+
+    can_safely_fail() {
+        return true;
+    }
 }

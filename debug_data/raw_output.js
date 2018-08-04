@@ -1,4 +1,4 @@
-document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated></canvas>`;
+document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:-moz-crisp-edges;image-rendering:pixelated></canvas>`;
 
 let is_fullscreen = false;
 
@@ -314,6 +314,10 @@ class BalloonLevelBase {
             onlevelend(true);
         }
     }
+
+    can_safely_fail() {
+        return true;
+    }
 }
 
 
@@ -443,6 +447,10 @@ Pop bubbles to rescue butterflies!`.trim();
             onlevelend(true);
         }
     }
+
+    can_safely_fail() {
+        return this.butterflies.length == 0;
+    }
 }
 
 
@@ -560,6 +568,10 @@ class VioletLevelBase {
             return !(violet.health <= 0 && violet.state == VioletState.HIDDEN);
         });
         this.check_if_level_end();
+    }
+
+    can_safely_fail() {
+        return true;
     }
 }
 
@@ -895,7 +907,15 @@ document.addEventListener('touchstart', e => click({which:1}));
 function add_arrow(arrow) {
     arrows.push(arrow);
     if (!arrows_remaining) {
-        last_arrow_timeout = setTimeout(_ => onlevelend(false), 6000);
+        handle_last_arrow();
+    }
+}
+
+function handle_last_arrow() {
+    if (arrows.length == 0 && level.can_safely_fail()) {
+        onlevelend(false);
+    } else {
+        setTimeout(handle_last_arrow, 500);
     }
 }
 
@@ -914,7 +934,7 @@ function change_remaining_arrows_to_score(callback) {
         --arrows_remaining;
         setTimeout(change_remaining_arrows_to_score, 1000, callback);
     } else {
-        setTimeout(callback, 3000);
+        setTimeout(callback, 2000);
     }
 }
 
@@ -1021,7 +1041,7 @@ function draw() {
                 }
             }
 
-            if (is_fullscreen) {
+            if (!is_fullscreen) {
                 status_text = 'Left click to enter fullscreen!';
             }
         }

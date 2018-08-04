@@ -49,4 +49,8 @@ class BalloonLevelBase {
             onlevelend(true);
         }
     }
+
+    can_safely_fail() {
+        return true;
+    }
 }

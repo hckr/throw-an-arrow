@@ -1,3 +1,5 @@
+let used_touch = false;
+
 let mouse_down = false,
     mouse_down_y,
     mouse_down_bow_pos_y;
@@ -33,7 +35,7 @@ function mouseup(e) {
     }
 }
 
-function mousemove(e, touch) {
+function mousemove(e) {
     if (!is_fullscreen) {
         return;
     }
@@ -52,6 +54,7 @@ c.addEventListener('mouseup', mouseup);
 c.addEventListener('mousemove', mousemove);
 
 document.addEventListener('touchstart', e => {
+    used_touch = true;
     mousedown({which: 3});
     mousedown({which: 1, pageY: e.touches[0].pageY});
 });
@@ -61,5 +64,5 @@ document.addEventListener('touchend', e => {
 });
 
 document.addEventListener('touchmove', e => {
-    mousemove({pageY: e.touches[0].pageY}, true);
+    mousemove({pageY: e.touches[0].pageY});
 });

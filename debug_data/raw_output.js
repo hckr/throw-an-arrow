@@ -1,14 +1,14 @@
-document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:-moz-crisp-edges;image-rendering:pixelated></canvas>`;
+document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:fixed;top:0;left:0;width:100%;height:100%;image-rendering:-moz-crisp-edges;image-rendering:pixelated></canvas>`;
 
 let is_fullscreen = false;
 
 function mousedown2() {
     (c.requestFullscreen || c.webkitRequestFullscreen || c.mozRequestFullScreen).call(document.body);
     (c.requestPointerLock || c.mozRequestPointerLock).call(c);
-    unmuteBackgroundMusic();
+    audioCtx.resume();
 }
 
-c.addEventListener('click', mousedown2);
+document.addEventListener('click', mousedown2);
 
 document.onwebkitfullscreenchange = document.onmozfullscreenchange = e => {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
@@ -25,15 +25,9 @@ let ctx = c.getContext('2d'),
 ctx.imageSmoothingEnabled = false;
 
 let canvas_real_height;
-function compute_canvas_height() {
-    canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height'));
-}
-addEventListener('resize', compute_canvas_height);
+addEventListener('resize', _ => canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height')));
 
-c.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    return false;
-});
+c.addEventListener('contextmenu', e => e.preventDefault());
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // debug code below (plus in draw function!)
@@ -114,14 +108,6 @@ audioCtx.decodeAudioData(ia.buffer, function(buffer) {
    source.loop = true;
    source.start(0);
 });
-
-function muteBackgroundMusic() {
-    gainNode.gain.setValueAtTime(0, 0);
-}
-
-function unmuteBackgroundMusic() {
-    gainNode.gain.setValueAtTime(1, 0);
-}
 
 
 
@@ -334,12 +320,16 @@ class Balloons1 extends BalloonLevelBase {
         super(onlevelend, 18, balloons);
 
         this.title = 'Balloons';
-        this.description = `
-Use a mouse to control the bow:
+        this.description = used_touch ?
+`Touch (and hold) to load an arrow,
+release... to release the arrow.
+Move the bow while touching and holding.`
+:
+`Use a mouse to control the bow:
 right click to load an arrow,
 left click (and hold) to strain the bow,
 and release... to release the arrow.
-Move the bow while left clicking and holding.`.trim();
+Move the bow while left clicking and holding.`;
     }
 }
 
@@ -673,6 +663,8 @@ function construct_level(n, onlevelend) {
     }
 }
 
+let used_touch = false;
+
 let mouse_down = false,
     mouse_down_y,
     mouse_down_bow_pos_y;
@@ -708,7 +700,7 @@ function mouseup(e) {
     }
 }
 
-function mousemove(e, touch) {
+function mousemove(e) {
     if (!is_fullscreen) {
         return;
     }
@@ -727,6 +719,7 @@ c.addEventListener('mouseup', mouseup);
 c.addEventListener('mousemove', mousemove);
 
 document.addEventListener('touchstart', e => {
+    used_touch = true;
     mousedown({which: 3});
     mousedown({which: 1, pageY: e.touches[0].pageY});
 });
@@ -736,7 +729,7 @@ document.addEventListener('touchend', e => {
 });
 
 document.addEventListener('touchmove', e => {
-    mousemove({pageY: e.touches[0].pageY}, true);
+    mousemove({pageY: e.touches[0].pageY});
 });
 
 class TextDrawer {
@@ -848,7 +841,6 @@ let bow = new Bow(-46, 3),
     arrows = [],
     level_n,
     level,
-    last_arrow_timeout = null,
     score = 0,
     score_to_add = 0,
     blink_val = 0;
@@ -902,7 +894,6 @@ function click(e) {
 }
 
 document.addEventListener('click', click);
-document.addEventListener('touchstart', e => click({which:1}));
 
 function add_arrow(arrow) {
     arrows.push(arrow);
@@ -928,13 +919,17 @@ function score_to_str(score) {
     return '0'.repeat(6 - score_str.length) + score_str;
 }
 
-function change_remaining_arrows_to_score(callback) {
+function change_remaining_arrows_to_score(callback, orig_arrows_remaining) {
     if (arrows_remaining) {
         add_score(50);
         --arrows_remaining;
-        setTimeout(change_remaining_arrows_to_score, 1000, callback);
+        setTimeout(change_remaining_arrows_to_score, 1000, callback, orig_arrows_remaining);
     } else {
-        setTimeout(callback, 2000);
+        let t = 5000 - (orig_arrows_remaining * 1000);
+        if (t < 1000) {
+            t = 1000;
+        }
+        setTimeout(callback, t);
     }
 }
 
@@ -945,9 +940,6 @@ function prepare_level() {
 }
 
 function onlevelend(success) {
-    clearTimeout(last_arrow_timeout);
-    last_arrow_timeout = null;
-
     bow.strain();
     bow.release_arrow(_=>{});
     arrows = [];
@@ -1001,7 +993,7 @@ function draw() {
             ctx.drawImage(an_canvas, 150, 160);
             ctx.drawImage(arrow_canvas, 200, 190);
 
-            status_text = 'Left click to play!';
+            status_text = used_touch ? 'Touch to play!' : 'Left click to play!';
             normal_font.draw_bottom_centered(ctx, 'Please visit https://github.com/hckr/throw-an-arrow\nfor information about the authors of used resources and the code');
         } else {
 
@@ -1042,7 +1034,7 @@ function draw() {
             }
 
             if (!is_fullscreen) {
-                status_text = 'Left click to enter fullscreen!';
+                status_text = 'Click to enter fullscreen!';
             }
         }
         ctx.save();
@@ -1077,7 +1069,7 @@ function draw() {
             } else {
                 ctx.globalAlpha = (125 - blink_val) * 0.02;
             }
-            status_font.draw_centered(ctx, 'Left click to start!', 50);
+            status_font.draw_centered(ctx, used_touch ? 'Touch to start!' : 'Left click to start!', 50);
         ctx.restore();
         break;
 
@@ -1114,7 +1106,7 @@ function draw() {
             } else {
                 ctx.globalAlpha = (125 - blink_val) * 0.02;
             }
-            status_font.draw_centered(ctx, 'Left click to start again!', 50);
+            status_font.draw_centered(ctx, used_touch ? 'Touch to start again!' : 'Left click to start again!', 50);
         ctx.restore();
 
     }

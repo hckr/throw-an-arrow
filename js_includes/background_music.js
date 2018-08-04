@@ -16,11 +16,3 @@ audioCtx.decodeAudioData(ia.buffer, function(buffer) {
    source.loop = true;
    source.start(0);
 });
-
-function muteBackgroundMusic() {
-    gainNode.gain.setValueAtTime(0, 0);
-}
-
-function unmuteBackgroundMusic() {
-    gainNode.gain.setValueAtTime(1, 0);
-}

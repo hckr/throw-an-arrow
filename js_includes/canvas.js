@@ -1,14 +1,14 @@
-document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:-moz-crisp-edges;image-rendering:pixelated></canvas>`;
+document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:fixed;top:0;left:0;width:100%;height:100%;image-rendering:-moz-crisp-edges;image-rendering:pixelated></canvas>`;
 
 let is_fullscreen = false;
 
 function mousedown2() {
     (c.requestFullscreen || c.webkitRequestFullscreen || c.mozRequestFullScreen).call(document.body);
     (c.requestPointerLock || c.mozRequestPointerLock).call(c);
-    unmuteBackgroundMusic();
+    audioCtx.resume();
 }
 
-c.addEventListener('click', mousedown2);
+document.addEventListener('click', mousedown2);
 
 document.onwebkitfullscreenchange = document.onmozfullscreenchange = e => {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
@@ -25,15 +25,9 @@ let ctx = c.getContext('2d'),
 ctx.imageSmoothingEnabled = false;
 
 let canvas_real_height;
-function compute_canvas_height() {
-    canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height'));
-}
-addEventListener('resize', compute_canvas_height);
+addEventListener('resize', _ => canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height')));
 
-c.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    return false;
-});
+c.addEventListener('contextmenu', e => e.preventDefault());
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // debug code below (plus in draw function!)

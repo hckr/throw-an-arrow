@@ -1,10 +1,22 @@
 document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated></canvas>`;
 
-c.addEventListener('mousedown', e => {
-    c.webkitRequestFullscreen();
-    c.requestPointerLock();
+let is_fullscreen = false;
+
+function mousedown2() {
+    (c.requestFullscreen || c.webkitRequestFullscreen || c.mozRequestFullScreen).call(document.body);
+    (c.requestPointerLock || c.mozRequestPointerLock).call(c);
     unmuteBackgroundMusic();
-});
+}
+
+c.addEventListener('click', mousedown2);
+
+document.onwebkitfullscreenchange = document.onmozfullscreenchange = e => {
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        is_fullscreen = true;
+    } else {
+        is_fullscreen = false;
+    }
+}
 
 let ctx = c.getContext('2d'),
     canvas_width = c.width,
@@ -20,6 +32,7 @@ addEventListener('resize', compute_canvas_height);
 
 c.addEventListener('contextmenu', e => {
     e.preventDefault();
+    return false;
 });
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -120,88 +133,94 @@ let BowState = Object.freeze({
     OTHER: 4
 });
 
-function Bow(pos_y, arrow_speed) {
-    this.frame = 0;
-    this.state = BowState.UNLOADED;
-    this.pos_y = pos_y;
-    this.arrow_speed = arrow_speed;
-    this.pos_y_min = 0;
-    this.pos_y_max = canvas_height - bow_frame_height;
-    this.strain_promise = null;
-}
-
-Bow.prototype.load_arrow = function() {
-    if (this.state == BowState.UNLOADED) {
-        this.frame = 1;
-        this.state = BowState.LOADED;
-        return true;
+class Bow {
+    constructor(pos_y, arrow_speed) {
+        this.frame = 0;
+        this.state = BowState.UNLOADED;
+        this.pos_y = pos_y;
+        this.arrow_speed = arrow_speed;
+        this.pos_y_min = 0;
+        this.pos_y_max = canvas_height - bow_frame_height;
+        this.strain_promise = null;
     }
-    return false;
-}
 
-Bow.prototype.strain = function() {
-    if (this.state != BowState.LOADED)
-        return;
-    this.state = BowState.OTHER;
-    this.strain_promise = new Promise((resolve, reject) => {
-        let that = this;
-        (function strain() {
-            setTimeout(_ => {
-                if (++that.frame < 11) {
-                    strain();
-                } else {
-                    this.state = BowState.STRAINED;
-                    resolve();
-                }
-            }, 30);
-        })();
-    });
-}
+    load_arrow() {
+        if (this.state == BowState.UNLOADED) {
+            this.frame = 1;
+            this.state = BowState.LOADED;
+            return true;
+        }
+        return false;
+    }
 
-Bow.prototype.release_arrow = function(add_arrow) {
-    if (!this.strain_promise)
-        return;
-    let promise = this.strain_promise;
-    this.strain_promise = null;
-    promise.then(_ => {
-        this.frame = 23;
-        add_arrow({
-            x: 0,
-            y: this.pos_y + 20,
-            speed: this.arrow_speed
+    strain() {
+        if (this.state != BowState.LOADED)
+            return;
+        this.state = BowState.OTHER;
+        this.strain_promise = new Promise((resolve, reject) => {
+            let that = this;
+            (function strain() {
+                setTimeout(_ => {
+                    if (++that.frame < 11) {
+                        strain();
+                    } else {
+                        that.state = BowState.STRAINED;
+                        resolve();
+                    }
+                }, 30);
+            })();
         });
-        let that = this;
-        play(shoot_sound);
-        (function restore_chord() {
-            setTimeout(_ => {
-                if (--that.frame > 12) {
-                    restore_chord();
-                } else {
-                    frame = 0;
-                    that.state = BowState.UNLOADED;
-                }
-            }, 10);
-        })();
-    });
-}
-
-Bow.prototype.move_y = function(diff) {
-    this.pos_y += diff
-    this.pos_y |= 0;
-    if (this.pos_y < this.pos_y_min) {
-        this.pos_y = this.pos_y_min;
-    } else if (this.pos_y > this.pos_y_max) {
-        this.pos_y = this.pos_y_max;
     }
-}
 
-Bow.prototype.draw_on = function(ctx) {
-    ctx.drawImage(bow_image, (this.frame % 6) * bow_frame_width, ((this.frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
-                  0, this.pos_y, bow_frame_width, bow_frame_height);
+    release_arrow(add_arrow) {
+        if (!this.strain_promise)
+            return;
+        let promise = this.strain_promise;
+        this.strain_promise = null;
+        promise.then(_ => {
+            this.frame = 23;
+            add_arrow({
+                x: 0,
+                y: this.pos_y + 20,
+                speed: this.arrow_speed
+            });
+            let that = this;
+            play(shoot_sound);
+            (function restore_chord() {
+                setTimeout(_ => {
+                    if (--that.frame > 12) {
+                        restore_chord();
+                    } else {
+                        that.state = BowState.UNLOADED;
+                    }
+                }, 10);
+            })();
+        });
+    }
 
-    if (this.state == BowState.STRAINED) {
-        console.log('test');
-        ctx.drawImage(arrow_image, 0, this.pos_y + 20);
+    move_y(diff) {
+        this.pos_y += diff
+        this.pos_y |= 0;
+        if (this.pos_y < this.pos_y_min) {
+            this.pos_y = this.pos_y_min;
+        } else if (this.pos_y > this.pos_y_max) {
+            this.pos_y = this.pos_y_max;
+        }
+    }
+
+    set_y(new_y) {
+        this.pos_y = new_y
+        this.pos_y |= 0;
+        if (this.pos_y < this.pos_y_min) {
+            this.pos_y = this.pos_y_min;
+        } else if (this.pos_y > this.pos_y_max) {
+            this.pos_y = this.pos_y_max;
+        }
+    }
+
+    draw_on(ctx) {
+        ctx.drawImage(bow_image, (this.frame % 6) * bow_frame_width, ((this.frame / 6) | 0) * bow_frame_height, bow_frame_width, bow_frame_height,
+                      0, this.pos_y, bow_frame_width, bow_frame_height);
     }
 }
 
@@ -642,13 +661,20 @@ function construct_level(n, onlevelend) {
     }
 }
 
-let mouse_down = false;
+let mouse_down = false,
+    mouse_down_y,
+    mouse_down_bow_pos_y;
 
-c.addEventListener('mousedown', e => {
+function mousedown(e) {
+    if (!is_fullscreen) {
+        return;
+    }
     switch (e.which) {
     case 1:
         bow.strain();
         mouse_down = true;
+        mouse_down_y = e.pageY;
+        mouse_down_bow_pos_y = bow.pos_y;
         break;
     case 3:
         if (arrows_remaining && game_state == GameState.LEVEL_PLAY) {
@@ -658,19 +684,47 @@ c.addEventListener('mousedown', e => {
         }
         break;
     }
-});
+}
 
-c.addEventListener('mouseup', e => {
+function mouseup(e) {
+    if (!is_fullscreen) {
+        return;
+    }
     if (e.which == 1) {
         bow.release_arrow(add_arrow);
         mouse_down = false;
     }
+}
+
+function mousemove(e, touch) {
+    if (!is_fullscreen) {
+        return;
+    }
+    if (game_state == GameState.LEVEL_PLAY && mouse_down) {
+        if (e.movementY) {
+            bow.move_y(e.movementY * canvas_height / canvas_real_height);
+        } else {
+            let diff = (e.pageY - mouse_down_y) * canvas_height / canvas_real_height;
+            bow.set_y(mouse_down_bow_pos_y + diff * 1.5);
+        }
+    }
+}
+
+c.addEventListener('mousedown', mousedown);
+c.addEventListener('mouseup', mouseup);
+c.addEventListener('mousemove', mousemove);
+
+document.addEventListener('touchstart', e => {
+    mousedown({which: 3});
+    mousedown({which: 1, pageY: e.touches[0].pageY});
 });
 
-c.addEventListener('mousemove', e => {
-    if (game_state == GameState.LEVEL_PLAY && mouse_down) {
-        bow.move_y(e.movementY * canvas_height / canvas_real_height);
-    }
+document.addEventListener('touchend', e => {
+    mouseup({which: 1});
+});
+
+document.addEventListener('touchmove', e => {
+    mousemove({pageY: e.touches[0].pageY}, true);
 });
 
 class TextDrawer {
@@ -687,9 +741,13 @@ class TextDrawer {
         for (let char of uptext) {
             let layout = this.layout[char];
             if (layout) {
-                let [cx, cy, cw, ch] = layout['rect'];
-                let [ox, oy] = layout['offset'];
-                ctx.drawImage(this.image, cx, cy, cw, ch, pos_x - ox, pos_y - oy, cw, ch);
+                let [cx, cy, cw, ch] = layout['rect'],
+                    [ox, oy] = layout['offset'],
+                    target_x = pos_x - ox,
+                    target_y = pos_y - oy;
+                if (cw) {
+                    ctx.drawImage(this.image, cx, cy, cw, ch, target_x, target_y, cw, ch);
+                }
                 pos_x += layout['advance'];
             } else if (char == '\n') {
                 pos_x = x;
@@ -809,7 +867,10 @@ let TitleScreenState = Object.freeze({
 let title_screen_state = TitleScreenState.REVEALING_BOW,
     title_screen_arrows = [];
 
-document.addEventListener('click', e => {
+function click(e) {
+    if (!is_fullscreen) {
+        return;
+    }
     if (e.which == 1) {
         switch (game_state) {
             case GameState.LEVEL_INFO:
@@ -826,7 +887,10 @@ document.addEventListener('click', e => {
                 break;
         }
     }
-});
+}
+
+document.addEventListener('click', click);
+document.addEventListener('touchstart', e => click({which:1}));
 
 function add_arrow(arrow) {
     arrows.push(arrow);
@@ -937,11 +1001,11 @@ function draw() {
                 let pos_x = 150,
                     width = (title_screen_arrows[1].x + arrow_width) - pos_x;
                 if (width > 0) {
-                    if (width > throw_canvas.width) {
-                        width = throw_canvas.width;
+                    if (width > an_canvas.width) {
+                        width = an_canvas.width;
                     }
-                    ctx.drawImage(an_canvas, 0, 0, width, throw_canvas.height,
-                                             pos_x, 160, width, throw_canvas.height);
+                    ctx.drawImage(an_canvas, 0, 0, width, an_canvas.height,
+                                             pos_x, 160, width, an_canvas.height);
                 }
             }
 
@@ -949,15 +1013,15 @@ function draw() {
                 let pos_x = 200,
                     width = (title_screen_arrows[2].x + arrow_width) - pos_x;
                 if (width > 0) {
-                    if (width > throw_canvas.width) {
-                        width = throw_canvas.width;
+                    if (width > arrow_canvas.width) {
+                        width = arrow_canvas.width;
                     }
-                    ctx.drawImage(arrow_canvas, 0, 0, width, throw_canvas.height,
-                                                pos_x, 190, width, throw_canvas.height);
+                    ctx.drawImage(arrow_canvas, 0, 0, width, arrow_canvas.height,
+                                                pos_x, 190, width, arrow_canvas.height);
                 }
             }
 
-            if (document.webkitFullscreenElement !== c) {
+            if (is_fullscreen) {
                 status_text = 'Left click to enter fullscreen!';
             }
         }

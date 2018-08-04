@@ -12,9 +12,13 @@ class TextDrawer {
         for (let char of uptext) {
             let layout = this.layout[char];
             if (layout) {
-                let [cx, cy, cw, ch] = layout['rect'];
-                let [ox, oy] = layout['offset'];
-                ctx.drawImage(this.image, cx, cy, cw, ch, pos_x - ox, pos_y - oy, cw, ch);
+                let [cx, cy, cw, ch] = layout['rect'],
+                    [ox, oy] = layout['offset'],
+                    target_x = pos_x - ox,
+                    target_y = pos_y - oy;
+                if (cw) {
+                    ctx.drawImage(this.image, cx, cy, cw, ch, target_x, target_y, cw, ch);
+                }
                 pos_x += layout['advance'];
             } else if (char == '\n') {
                 pos_x = x;

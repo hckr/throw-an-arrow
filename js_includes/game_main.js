@@ -41,7 +41,10 @@ let TitleScreenState = Object.freeze({
 let title_screen_state = TitleScreenState.REVEALING_BOW,
     title_screen_arrows = [];
 
-document.addEventListener('click', e => {
+function click(e) {
+    if (!is_fullscreen) {
+        return;
+    }
     if (e.which == 1) {
         switch (game_state) {
             case GameState.LEVEL_INFO:
@@ -58,7 +61,10 @@ document.addEventListener('click', e => {
                 break;
         }
     }
-});
+}
+
+document.addEventListener('click', click);
+document.addEventListener('touchstart', e => click({which:1}));
 
 function add_arrow(arrow) {
     arrows.push(arrow);
@@ -169,11 +175,11 @@ function draw() {
                 let pos_x = 150,
                     width = (title_screen_arrows[1].x + arrow_width) - pos_x;
                 if (width > 0) {
-                    if (width > throw_canvas.width) {
-                        width = throw_canvas.width;
+                    if (width > an_canvas.width) {
+                        width = an_canvas.width;
                     }
-                    ctx.drawImage(an_canvas, 0, 0, width, throw_canvas.height,
-                                             pos_x, 160, width, throw_canvas.height);
+                    ctx.drawImage(an_canvas, 0, 0, width, an_canvas.height,
+                                             pos_x, 160, width, an_canvas.height);
                 }
             }
 
@@ -181,15 +187,15 @@ function draw() {
                 let pos_x = 200,
                     width = (title_screen_arrows[2].x + arrow_width) - pos_x;
                 if (width > 0) {
-                    if (width > throw_canvas.width) {
-                        width = throw_canvas.width;
+                    if (width > arrow_canvas.width) {
+                        width = arrow_canvas.width;
                     }
-                    ctx.drawImage(arrow_canvas, 0, 0, width, throw_canvas.height,
-                                                pos_x, 190, width, throw_canvas.height);
+                    ctx.drawImage(arrow_canvas, 0, 0, width, arrow_canvas.height,
+                                                pos_x, 190, width, arrow_canvas.height);
                 }
             }
 
-            if (document.webkitFullscreenElement !== c) {
+            if (is_fullscreen) {
                 status_text = 'Left click to enter fullscreen!';
             }
         }

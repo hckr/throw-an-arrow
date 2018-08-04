@@ -1,10 +1,22 @@
 document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated></canvas>`;
 
-c.addEventListener('mousedown', e => {
-    c.webkitRequestFullscreen();
-    c.requestPointerLock();
+let is_fullscreen = false;
+
+function mousedown2() {
+    (c.requestFullscreen || c.webkitRequestFullscreen || c.mozRequestFullScreen).call(document.body);
+    (c.requestPointerLock || c.mozRequestPointerLock).call(c);
     unmuteBackgroundMusic();
-});
+}
+
+c.addEventListener('click', mousedown2);
+
+document.onwebkitfullscreenchange = document.onmozfullscreenchange = e => {
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        is_fullscreen = true;
+    } else {
+        is_fullscreen = false;
+    }
+}
 
 let ctx = c.getContext('2d'),
     canvas_width = c.width,
@@ -20,6 +32,7 @@ addEventListener('resize', compute_canvas_height);
 
 c.addEventListener('contextmenu', e => {
     e.preventDefault();
+    return false;
 });
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

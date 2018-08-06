@@ -926,7 +926,7 @@ function change_remaining_arrows_to_score(callback, orig_arrows_remaining) {
     if (arrows_remaining) {
         add_score(50);
         --arrows_remaining;
-        setTimeout(change_remaining_arrows_to_score, 1000, callback, orig_arrows_remaining);
+        setTimeout(change_remaining_arrows_to_score, 1000, callback, (orig_arrows_remaining || arrows_remaining));
     } else {
         let t = 5000 - ((orig_arrows_remaining || 0) * 1000);
         if (t < 1000) {

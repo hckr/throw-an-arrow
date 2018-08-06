@@ -12,7 +12,8 @@ let bow = new Bow(-46, 3),
     level,
     score = 0,
     score_to_add = 0,
-    blink_val = 0;
+    blink_val = 0,
+    last_arrow_handler_enabled = false;
 
 localStorage['best_score'] = localStorage['best_score'] || 0;
 
@@ -72,11 +73,17 @@ function add_arrow(arrow) {
 }
 
 function handle_last_arrow() {
-    if (arrows.length == 0 && level.can_safely_fail()) {
-        onlevelend(false);
-    } else {
-        setTimeout(handle_last_arrow, 500);
-    }
+    last_arrow_handler_enabled = true;
+    setTimeout(function h() {
+        if (!last_arrow_handler_enabled) {
+            return;
+        }
+        if (arrows.length == 0 && level.can_safely_fail()) {
+            onlevelend(false);
+        } else {
+            setTimeout(h, 500);
+        }
+    });
 }
 
 function add_score(count) {
@@ -94,7 +101,7 @@ function change_remaining_arrows_to_score(callback, orig_arrows_remaining) {
         --arrows_remaining;
         setTimeout(change_remaining_arrows_to_score, 1000, callback, orig_arrows_remaining);
     } else {
-        let t = 5000 - (orig_arrows_remaining * 1000);
+        let t = 5000 - ((orig_arrows_remaining || 0) * 1000);
         if (t < 1000) {
             t = 1000;
         }
@@ -109,6 +116,8 @@ function prepare_level() {
 }
 
 function onlevelend(success) {
+    last_arrow_handler_enabled = false;
+
     bow.strain();
     bow.release_arrow(_=>{});
     arrows = [];
@@ -150,72 +159,47 @@ big_font.draw(throw_ctx, 0, throw_canvas.height, 'Throw');
 big_font.draw(an_ctx, 0, an_canvas.height, 'an');
 big_font.draw(arrow_ctx, 0, arrow_canvas.height, 'arrow');
 
+function draw_title_screen_line(index, canvas, pos_x, pos_y) {
+    if (title_screen_arrows[index]) {
+        let width = (title_screen_arrows[index].x + arrow_width) - pos_x;
+        if (width > 0) {
+            if (width > canvas.width) {
+                width = canvas.width;
+            }
+            ctx.drawImage(canvas, 0, 0, width, canvas.height,
+                                  pos_x, pos_y, width, canvas.height);
+        }
+    }
+}
+
+function draw_centered_blink(text, pos_y) {
+    ctx.save();
+        if (blink_val < 50) {
+            ctx.globalAlpha = blink_val * 0.02;
+        } else if (blink_val >= 75) {
+            ctx.globalAlpha = (125 - blink_val) * 0.02;
+        }
+        status_font.draw_centered(ctx, text, pos_y);
+    ctx.restore();
+}
+
 function draw() {
     switch (game_state) {
     case GameState.TITLE_SCREEN:
-        ctx.drawImage(sky_image, 0, 0, sky_image.width, sky_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(sky_image, 0, 0, canvas_width, canvas_height);
+
+        draw_title_screen_line(0, throw_canvas, 60, 130);
+        draw_title_screen_line(1, an_canvas, 150, 160);
+        draw_title_screen_line(2, arrow_canvas, 200, 190);
 
         let status_text = '';
-
         if (title_screen_state == TitleScreenState.AFTER_INTRO) {
-            ctx.drawImage(throw_canvas, 60, 130);
-            ctx.drawImage(an_canvas, 150, 160);
-            ctx.drawImage(arrow_canvas, 200, 190);
-
             status_text = used_touch ? 'Touch to play!' : 'Left click to play!';
             normal_font.draw_bottom_centered(ctx, 'Please visit https://github.com/hckr/throw-an-arrow\nfor information about the authors of used resources and the code');
-        } else {
-
-            if (title_screen_arrows[0]) {
-                let pos_x = 60,
-                    width = (title_screen_arrows[0].x + arrow_width) - pos_x;
-                if (width > 0) {
-                    if (width > throw_canvas.width) {
-                        width = throw_canvas.width;
-                    }
-                    ctx.drawImage(throw_canvas, 0, 0, width, throw_canvas.height,
-                                                pos_x, 130, width, throw_canvas.height);
-                }
-            }
-
-            if (title_screen_arrows[1]) {
-                let pos_x = 150,
-                    width = (title_screen_arrows[1].x + arrow_width) - pos_x;
-                if (width > 0) {
-                    if (width > an_canvas.width) {
-                        width = an_canvas.width;
-                    }
-                    ctx.drawImage(an_canvas, 0, 0, width, an_canvas.height,
-                                             pos_x, 160, width, an_canvas.height);
-                }
-            }
-
-            if (title_screen_arrows[2]) {
-                let pos_x = 200,
-                    width = (title_screen_arrows[2].x + arrow_width) - pos_x;
-                if (width > 0) {
-                    if (width > arrow_canvas.width) {
-                        width = arrow_canvas.width;
-                    }
-                    ctx.drawImage(arrow_canvas, 0, 0, width, arrow_canvas.height,
-                                                pos_x, 190, width, arrow_canvas.height);
-                }
-            }
-
-            if (!is_fullscreen) {
-                status_text = 'Click to enter fullscreen!';
-            }
+        } else if (!is_fullscreen) {
+            status_text = 'Click to enter fullscreen!';
         }
-        ctx.save();
-            if (blink_val < 50) {
-                ctx.globalAlpha = blink_val * 0.02;
-            } else if (blink_val < 75) {
-                // alpha == 1
-            } else {
-                ctx.globalAlpha = (125 - blink_val) * 0.02;
-            }
-            status_font.draw_centered(ctx, status_text, 20);
-        ctx.restore();
+        draw_centered_blink(status_text, 20);
 
         bow.draw_on(ctx);
 
@@ -226,24 +210,15 @@ function draw() {
         break;
 
     case GameState.LEVEL_INFO:
-        ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(level.bg_image, 0, 0, canvas_width, canvas_height);
         bow.draw_on(ctx);
         big_font.draw_centered(ctx, `Level ${level_n}\n${level.title}`);
         normal_font.draw_bottom_centered(ctx, level.description);
-        ctx.save();
-            if (blink_val < 50) {
-                ctx.globalAlpha = blink_val * 0.02;
-            } else if (blink_val < 75) {
-                // alpha == 1
-            } else {
-                ctx.globalAlpha = (125 - blink_val) * 0.02;
-            }
-            status_font.draw_centered(ctx, used_touch ? 'Touch to start!' : 'Left click to start!', 50);
-        ctx.restore();
+        draw_centered_blink(used_touch ? 'Touch to start!' : 'Left click to start!', 50);
         break;
 
     case GameState.LEVEL_PLAY:
-        ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(level.bg_image, 0, 0, canvas_width, canvas_height);
         bow.draw_on(ctx);
         for (let arrow of arrows) {
             ctx.drawImage(arrow_image, arrow.x, arrow.y);
@@ -264,19 +239,11 @@ function draw() {
         break;
 
     case GameState.END_SCREEN:
-        ctx.drawImage(sky_image, 0, 0, sky_image.width, sky_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(sky_image, 0, 0, canvas_width, canvas_height);
         big_font.draw_centered(ctx, `Congratulations!\nYou finished the game`);
         normal_font.draw_bottom_centered(ctx, 'I hope you liked it.');
-        ctx.save();
-            if (blink_val < 50) {
-                ctx.globalAlpha = blink_val * 0.02;
-            } else if (blink_val < 75) {
-                // alpha == 1
-            } else {
-                ctx.globalAlpha = (125 - blink_val) * 0.02;
-            }
-            status_font.draw_centered(ctx, used_touch ? 'Touch to start again!' : 'Left click to start again!', 50);
-        ctx.restore();
+        draw_centered_blink(used_touch ? 'Touch to start again!' : 'Left click to start again!', 50);
+
 
     }
 
@@ -384,7 +351,6 @@ function update() {
                 bow.pos_y -= 1;
             } else {
                 if (title_screen_arrows[2] && title_screen_arrows[2].x > canvas_width) {
-                    title_screen_arrows = [];
                     title_screen_state = TitleScreenState.AFTER_INTRO;
                 }
             }

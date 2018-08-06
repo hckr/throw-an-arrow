@@ -51,6 +51,6 @@ class BalloonLevelBase {
     }
 
     can_safely_fail() {
-        return true;
+        return this.balloons.length > 0 && this.balloons.filter(balloon => balloon.pierced).length == 0;
     }
 }

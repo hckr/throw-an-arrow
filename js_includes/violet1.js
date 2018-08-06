@@ -5,10 +5,10 @@ class Violet1 extends VioletLevelBase {
         super(onlevelend, 45);
 
         this.title = 'Bad weather';
-        this.description = `
-Some angry clouds are on their way.
+        this.description =
+`Some angry clouds are on their way.
 Don't let them ruin the weather.
 You have to hit them multiple times
-until they go away.`.trim();
+until they go away.`;
     }
 }

@@ -40,18 +40,18 @@ function mousemove(e) {
         return;
     }
     if (game_state == GameState.LEVEL_PLAY && mouse_down) {
-        if (e.movementY) {
-            bow.move_y(e.movementY * canvas_height / canvas_real_height);
-        } else {
+        if (e.movementY === undefined) {
             let diff = (e.pageY - mouse_down_y) * canvas_height / canvas_real_height;
             bow.set_y(mouse_down_bow_pos_y + diff * 1.5);
+        } else {
+            bow.move_y(e.movementY * canvas_height / canvas_real_height);
         }
     }
 }
 
-c.addEventListener('mousedown', mousedown);
-c.addEventListener('mouseup', mouseup);
-c.addEventListener('mousemove', mousemove);
+document.addEventListener('mousedown', mousedown);
+document.addEventListener('mouseup', mouseup);
+document.addEventListener('mousemove', mousemove);
 
 document.addEventListener('touchstart', e => {
     used_touch = true;

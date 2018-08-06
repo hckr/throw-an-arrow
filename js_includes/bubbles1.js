@@ -22,8 +22,7 @@ class Bubbles1 {
         this.bg_image = sky_image;
 
         this.title = 'Bubbles';
-        this.description = `
-Pop bubbles to rescue butterflies!`.trim();
+        this.description = 'Pop bubbles to rescue butterflies!';
     }
 
     draw_on(ctx) {
@@ -82,6 +81,6 @@ Pop bubbles to rescue butterflies!`.trim();
     }
 
     can_safely_fail() {
-        return this.butterflies.length == 0;
+        return this.bubbles.length > 0 && this.butterflies.length == 0;
     }
 }

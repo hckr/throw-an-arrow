@@ -2,15 +2,13 @@ document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:fixe
 
 let is_fullscreen = false;
 
-function mousedown2() {
+document.addEventListener('click', _ => {
     (c.requestFullscreen || c.webkitRequestFullscreen || c.mozRequestFullScreen).call(document.body);
     (c.requestPointerLock || c.mozRequestPointerLock).call(c);
     audioCtx.resume();
-}
+});
 
-document.addEventListener('click', mousedown2);
-
-document.onwebkitfullscreenchange = document.onmozfullscreenchange = e => {
+document.onwebkitfullscreenchange = document.onmozfullscreenchange = _ => {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
         is_fullscreen = true;
     } else {
@@ -27,7 +25,7 @@ ctx.imageSmoothingEnabled = false;
 let canvas_real_height;
 addEventListener('resize', _ => canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height')));
 
-c.addEventListener('contextmenu', e => e.preventDefault());
+document.oncontextmenu = e => e.preventDefault();
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // debug code below (plus in draw function!)

@@ -2,15 +2,13 @@ document.body.innerHTML = `<canvas id=c width=360 height=400 style=position:fixe
 
 let is_fullscreen = false;
 
-function mousedown2() {
+document.addEventListener('click', _ => {
     (c.requestFullscreen || c.webkitRequestFullscreen || c.mozRequestFullScreen).call(document.body);
     (c.requestPointerLock || c.mozRequestPointerLock).call(c);
     audioCtx.resume();
-}
+});
 
-document.addEventListener('click', mousedown2);
-
-document.onwebkitfullscreenchange = document.onmozfullscreenchange = e => {
+document.onwebkitfullscreenchange = document.onmozfullscreenchange = _ => {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
         is_fullscreen = true;
     } else {
@@ -27,7 +25,7 @@ ctx.imageSmoothingEnabled = false;
 let canvas_real_height;
 addEventListener('resize', _ => canvas_real_height = parseInt(getComputedStyle(c, null).getPropertyValue('height')));
 
-c.addEventListener('contextmenu', e => e.preventDefault());
+document.oncontextmenu = e => e.preventDefault();
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // debug code below (plus in draw function!)
@@ -302,7 +300,7 @@ class BalloonLevelBase {
     }
 
     can_safely_fail() {
-        return true;
+        return this.balloons.length > 0 && this.balloons.filter(balloon => balloon.pierced).length == 0;
     }
 }
 
@@ -350,8 +348,7 @@ class Balloons2 extends BalloonLevelBase {
         super(onlevelend, 25, balloons);
 
         this.title = 'More balloons';
-        this.description = `
-You might want to wait until they form a single line.`.trim();
+        this.description = 'You might want to wait until they form a single line.';
     }
 }
 
@@ -379,8 +376,7 @@ class Bubbles1 {
         this.bg_image = sky_image;
 
         this.title = 'Bubbles';
-        this.description = `
-Pop bubbles to rescue butterflies!`.trim();
+        this.description = 'Pop bubbles to rescue butterflies!';
     }
 
     draw_on(ctx) {
@@ -439,7 +435,7 @@ Pop bubbles to rescue butterflies!`.trim();
     }
 
     can_safely_fail() {
-        return this.butterflies.length == 0;
+        return this.bubbles.length > 0 && this.butterflies.length == 0;
     }
 }
 
@@ -561,7 +557,7 @@ class VioletLevelBase {
     }
 
     can_safely_fail() {
-        return true;
+        return this.violets.length > 0 && this.violets.filter(violet => violet.health <= 0).length == 0;
     }
 }
 
@@ -571,11 +567,11 @@ class Violet1 extends VioletLevelBase {
         super(onlevelend, 45);
 
         this.title = 'Bad weather';
-        this.description = `
-Some angry clouds are on their way.
+        this.description =
+`Some angry clouds are on their way.
 Don't let them ruin the weather.
 You have to hit them multiple times
-until they go away.`.trim();
+until they go away.`;
     }
 }
 
@@ -588,12 +584,12 @@ class Violet2 extends VioletLevelBase {
         setTimeout(_ => this.release_minion(true), 1500);
 
         this.title = 'Even worse weather';
-        this.description = `
-The clouds are not giving up!
+        this.description =
+`The clouds are not giving up!
 Now they can shoot something which
 is stopping your arrows
 and can damage your bow!
-(Just let it fly away, don't waste arrows.)`.trim();
+Just let it fly away, don't waste arrows.`;
     }
 
     release_minion(timeout) {
@@ -705,18 +701,18 @@ function mousemove(e) {
         return;
     }
     if (game_state == GameState.LEVEL_PLAY && mouse_down) {
-        if (e.movementY) {
-            bow.move_y(e.movementY * canvas_height / canvas_real_height);
-        } else {
+        if (e.movementY === undefined) {
             let diff = (e.pageY - mouse_down_y) * canvas_height / canvas_real_height;
             bow.set_y(mouse_down_bow_pos_y + diff * 1.5);
+        } else {
+            bow.move_y(e.movementY * canvas_height / canvas_real_height);
         }
     }
 }
 
-c.addEventListener('mousedown', mousedown);
-c.addEventListener('mouseup', mouseup);
-c.addEventListener('mousemove', mousemove);
+document.addEventListener('mousedown', mousedown);
+document.addEventListener('mouseup', mouseup);
+document.addEventListener('mousemove', mousemove);
 
 document.addEventListener('touchstart', e => {
     used_touch = true;
@@ -843,7 +839,8 @@ let bow = new Bow(-46, 3),
     level,
     score = 0,
     score_to_add = 0,
-    blink_val = 0;
+    blink_val = 0,
+    last_arrow_handler_enabled = false;
 
 localStorage['best_score'] = localStorage['best_score'] || 0;
 
@@ -903,11 +900,17 @@ function add_arrow(arrow) {
 }
 
 function handle_last_arrow() {
-    if (arrows.length == 0 && level.can_safely_fail()) {
-        onlevelend(false);
-    } else {
-        setTimeout(handle_last_arrow, 500);
-    }
+    last_arrow_handler_enabled = true;
+    setTimeout(function h() {
+        if (!last_arrow_handler_enabled) {
+            return;
+        }
+        if (arrows.length == 0 && level.can_safely_fail()) {
+            onlevelend(false);
+        } else {
+            setTimeout(h, 500);
+        }
+    });
 }
 
 function add_score(count) {
@@ -925,7 +928,7 @@ function change_remaining_arrows_to_score(callback, orig_arrows_remaining) {
         --arrows_remaining;
         setTimeout(change_remaining_arrows_to_score, 1000, callback, orig_arrows_remaining);
     } else {
-        let t = 5000 - (orig_arrows_remaining * 1000);
+        let t = 5000 - ((orig_arrows_remaining || 0) * 1000);
         if (t < 1000) {
             t = 1000;
         }
@@ -940,6 +943,8 @@ function prepare_level() {
 }
 
 function onlevelend(success) {
+    last_arrow_handler_enabled = false;
+
     bow.strain();
     bow.release_arrow(_=>{});
     arrows = [];
@@ -981,72 +986,47 @@ big_font.draw(throw_ctx, 0, throw_canvas.height, 'Throw');
 big_font.draw(an_ctx, 0, an_canvas.height, 'an');
 big_font.draw(arrow_ctx, 0, arrow_canvas.height, 'arrow');
 
+function draw_title_screen_line(index, canvas, pos_x, pos_y) {
+    if (title_screen_arrows[index]) {
+        let width = (title_screen_arrows[index].x + arrow_width) - pos_x;
+        if (width > 0) {
+            if (width > canvas.width) {
+                width = canvas.width;
+            }
+            ctx.drawImage(canvas, 0, 0, width, canvas.height,
+                                  pos_x, pos_y, width, canvas.height);
+        }
+    }
+}
+
+function draw_centered_blink(text, pos_y) {
+    ctx.save();
+        if (blink_val < 50) {
+            ctx.globalAlpha = blink_val * 0.02;
+        } else if (blink_val >= 75) {
+            ctx.globalAlpha = (125 - blink_val) * 0.02;
+        }
+        status_font.draw_centered(ctx, text, pos_y);
+    ctx.restore();
+}
+
 function draw() {
     switch (game_state) {
     case GameState.TITLE_SCREEN:
-        ctx.drawImage(sky_image, 0, 0, sky_image.width, sky_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(sky_image, 0, 0, canvas_width, canvas_height);
+
+        draw_title_screen_line(0, throw_canvas, 60, 130);
+        draw_title_screen_line(1, an_canvas, 150, 160);
+        draw_title_screen_line(2, arrow_canvas, 200, 190);
 
         let status_text = '';
-
         if (title_screen_state == TitleScreenState.AFTER_INTRO) {
-            ctx.drawImage(throw_canvas, 60, 130);
-            ctx.drawImage(an_canvas, 150, 160);
-            ctx.drawImage(arrow_canvas, 200, 190);
-
             status_text = used_touch ? 'Touch to play!' : 'Left click to play!';
             normal_font.draw_bottom_centered(ctx, 'Please visit https://github.com/hckr/throw-an-arrow\nfor information about the authors of used resources and the code');
-        } else {
-
-            if (title_screen_arrows[0]) {
-                let pos_x = 60,
-                    width = (title_screen_arrows[0].x + arrow_width) - pos_x;
-                if (width > 0) {
-                    if (width > throw_canvas.width) {
-                        width = throw_canvas.width;
-                    }
-                    ctx.drawImage(throw_canvas, 0, 0, width, throw_canvas.height,
-                                                pos_x, 130, width, throw_canvas.height);
-                }
-            }
-
-            if (title_screen_arrows[1]) {
-                let pos_x = 150,
-                    width = (title_screen_arrows[1].x + arrow_width) - pos_x;
-                if (width > 0) {
-                    if (width > an_canvas.width) {
-                        width = an_canvas.width;
-                    }
-                    ctx.drawImage(an_canvas, 0, 0, width, an_canvas.height,
-                                             pos_x, 160, width, an_canvas.height);
-                }
-            }
-
-            if (title_screen_arrows[2]) {
-                let pos_x = 200,
-                    width = (title_screen_arrows[2].x + arrow_width) - pos_x;
-                if (width > 0) {
-                    if (width > arrow_canvas.width) {
-                        width = arrow_canvas.width;
-                    }
-                    ctx.drawImage(arrow_canvas, 0, 0, width, arrow_canvas.height,
-                                                pos_x, 190, width, arrow_canvas.height);
-                }
-            }
-
-            if (!is_fullscreen) {
-                status_text = 'Click to enter fullscreen!';
-            }
+        } else if (!is_fullscreen) {
+            status_text = 'Click to enter fullscreen!';
         }
-        ctx.save();
-            if (blink_val < 50) {
-                ctx.globalAlpha = blink_val * 0.02;
-            } else if (blink_val < 75) {
-                // alpha == 1
-            } else {
-                ctx.globalAlpha = (125 - blink_val) * 0.02;
-            }
-            status_font.draw_centered(ctx, status_text, 20);
-        ctx.restore();
+        draw_centered_blink(status_text, 20);
 
         bow.draw_on(ctx);
 
@@ -1057,24 +1037,15 @@ function draw() {
         break;
 
     case GameState.LEVEL_INFO:
-        ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(level.bg_image, 0, 0, canvas_width, canvas_height);
         bow.draw_on(ctx);
         big_font.draw_centered(ctx, `Level ${level_n}\n${level.title}`);
         normal_font.draw_bottom_centered(ctx, level.description);
-        ctx.save();
-            if (blink_val < 50) {
-                ctx.globalAlpha = blink_val * 0.02;
-            } else if (blink_val < 75) {
-                // alpha == 1
-            } else {
-                ctx.globalAlpha = (125 - blink_val) * 0.02;
-            }
-            status_font.draw_centered(ctx, used_touch ? 'Touch to start!' : 'Left click to start!', 50);
-        ctx.restore();
+        draw_centered_blink(used_touch ? 'Touch to start!' : 'Left click to start!', 50);
         break;
 
     case GameState.LEVEL_PLAY:
-        ctx.drawImage(level.bg_image, 0, 0, level.bg_image.width, level.bg_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(level.bg_image, 0, 0, canvas_width, canvas_height);
         bow.draw_on(ctx);
         for (let arrow of arrows) {
             ctx.drawImage(arrow_image, arrow.x, arrow.y);
@@ -1095,19 +1066,11 @@ function draw() {
         break;
 
     case GameState.END_SCREEN:
-        ctx.drawImage(sky_image, 0, 0, sky_image.width, sky_image.height, 0, 0, canvas_width, canvas_height);
+        ctx.drawImage(sky_image, 0, 0, canvas_width, canvas_height);
         big_font.draw_centered(ctx, `Congratulations!\nYou finished the game`);
         normal_font.draw_bottom_centered(ctx, 'I hope you liked it.');
-        ctx.save();
-            if (blink_val < 50) {
-                ctx.globalAlpha = blink_val * 0.02;
-            } else if (blink_val < 75) {
-                // alpha == 1
-            } else {
-                ctx.globalAlpha = (125 - blink_val) * 0.02;
-            }
-            status_font.draw_centered(ctx, used_touch ? 'Touch to start again!' : 'Left click to start again!', 50);
-        ctx.restore();
+        draw_centered_blink(used_touch ? 'Touch to start again!' : 'Left click to start again!', 50);
+
 
     }
 
@@ -1215,7 +1178,6 @@ function update() {
                 bow.pos_y -= 1;
             } else {
                 if (title_screen_arrows[2] && title_screen_arrows[2].x > canvas_width) {
-                    title_screen_arrows = [];
                     title_screen_state = TitleScreenState.AFTER_INTRO;
                 }
             }

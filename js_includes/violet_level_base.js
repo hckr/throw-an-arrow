@@ -116,6 +116,6 @@ class VioletLevelBase {
     }
 
     can_safely_fail() {
-        return true;
+        return this.violets.length > 0 && this.violets.filter(violet => violet.health <= 0).length == 0;
     }
 }

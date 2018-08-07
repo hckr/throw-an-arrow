@@ -1,5 +1,5 @@
-// include_once{bow.js}
 // include_once{images.js}
+// include_once{bow.js}
 // include_once{levels.js}
 // include_once{bow_events.js}
 // include_once{text.js}
@@ -156,9 +156,12 @@ let throw_canvas = document.createElement('canvas'),
 [an_canvas.width, an_canvas.height] = big_font.measure('an');
 [arrow_canvas.width, arrow_canvas.height] = big_font.measure('arrow');
 
-big_font.draw(throw_ctx, 0, throw_canvas.height, 'Throw');
-big_font.draw(an_ctx, 0, an_canvas.height, 'an');
-big_font.draw(arrow_ctx, 0, arrow_canvas.height, 'arrow');
+// wait until font is definetely loaded
+setTimeout(_ => {
+    big_font.draw(throw_ctx, 0, throw_canvas.height, 'Throw');
+    big_font.draw(an_ctx, 0, an_canvas.height, 'an');
+    big_font.draw(arrow_ctx, 0, arrow_canvas.height, 'arrow');
+}, 500);
 
 function draw_title_screen_line(index, canvas, pos_x, pos_y) {
     if (title_screen_arrows[index]) {

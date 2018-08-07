@@ -883,6 +883,7 @@ function click(e) {
                 }
                 // no break
             case GameState.END_SCREEN:
+                score = 0;
                 level_n = 1;
                 prepare_level();
                 break;
